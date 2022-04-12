@@ -44,7 +44,7 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.View
 
         public ViewHolder(View itemView) {
             super(itemView);
-            imageName =  itemView.findViewById(R.id.image_text_view);
+            imageName = itemView.findViewById(R.id.image_text_view);
         }
     }
 }
