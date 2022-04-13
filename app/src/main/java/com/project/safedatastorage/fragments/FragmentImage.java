@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +27,7 @@ public class FragmentImage extends Fragment {
     View view;
     private RecyclerView recyclerView;
     private List<ImageItem> listImages;
+    Button addImage;
 
 
     public FragmentImage() {
@@ -41,6 +44,14 @@ public class FragmentImage extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
 
+        addImage = view.findViewById(R.id.add_img_btn);
+
+        addImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "TEST MSG", Toast.LENGTH_LONG).show();
+            }
+        });
 
         return view;
     }
