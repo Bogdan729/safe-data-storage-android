@@ -7,7 +7,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,6 +17,7 @@ import com.project.safedatastorage.ImageViewAdapter;
 import com.project.safedatastorage.R;
 import com.project.safedatastorage.items.ImageItem;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +41,7 @@ public class FragmentImage extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
 
+
         return view;
     }
 
@@ -46,23 +50,16 @@ public class FragmentImage extends Fragment {
         super.onCreate(savedInstanceState);
 
         listImages = new ArrayList<>();
-        listImages.add(new ImageItem("img1"));
-        listImages.add(new ImageItem("img2"));
-        listImages.add(new ImageItem("img3"));
-        listImages.add(new ImageItem("img1"));
-        listImages.add(new ImageItem("img2"));
-        listImages.add(new ImageItem("img3"));
-        listImages.add(new ImageItem("img1"));
-        listImages.add(new ImageItem("img2"));
-        listImages.add(new ImageItem("img3"));
-        listImages.add(new ImageItem("img1"));
-        listImages.add(new ImageItem("img2"));
-        listImages.add(new ImageItem("img3"));
-        listImages.add(new ImageItem("img1"));
-        listImages.add(new ImageItem("img2"));
-        listImages.add(new ImageItem("img3"));
-        listImages.add(new ImageItem("img1"));
-        listImages.add(new ImageItem("img2"));
-        listImages.add(new ImageItem("img3"));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
     }
 }

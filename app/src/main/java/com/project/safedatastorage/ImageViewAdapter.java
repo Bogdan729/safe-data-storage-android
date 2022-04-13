@@ -4,9 +4,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.safedatastorage.items.ImageItem;
@@ -26,12 +28,14 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.recycler_item, parent, false));
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.photo_container, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.imageName.setText(imageItemList.get(position).getImageName());
+        holder.imgName.setText(imageItemList.get(position).getImageName());
+        holder.imgSize.setText(imageItemList.get(position).getImageSize());
+        holder.imgView.setImageDrawable(imageItemList.get(position).getImage());
     }
 
     @Override
@@ -40,11 +44,16 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.View
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView imageName;
+        private TextView imgName, imgSize;
+        private CardView container;
+        private ImageView imgView;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            imageName = itemView.findViewById(R.id.image_text_view);
+            container = itemView.findViewById(R.id.image_container);
+            imgName = itemView.findViewById(R.id.tv_img_name);
+            imgSize = itemView.findViewById(R.id.tv_img_size);
+            imgView = itemView.findViewById(R.id.photo_img_view);
         }
     }
 }
