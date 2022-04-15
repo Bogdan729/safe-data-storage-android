@@ -1,52 +1,46 @@
 package com.project.safedatastorage;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
+
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+import com.project.safedatastorage.fragments.FragmentFile;
+import com.project.safedatastorage.fragments.FragmentImage;
+import com.project.safedatastorage.fragments.FragmentVideo;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager2;
+    private ViewPagerAdapter adapter;
 
-    ImageView imageView;
-    Button button;
-    Uri imageUri;
-
+    String[] listTitle = {"Фото", "Документы", "Видео"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_test_fargments);
 
+        tabLayout = findViewById(R.id.tab_layout);
+        viewPager2 = findViewById(R.id.view_pager);
 
-        imageView = findViewById(R.id.imageView);
-        button = findViewById(R.id.buttonLoadPicture);
+        adapter = new ViewPagerAdapter(this);
+        adapter.addFragment(new FragmentImage());
+        adapter.addFragment(new FragmentFile());
+        adapter.addFragment(new FragmentVideo());
 
-        // Вместо переопределения метода onActivityResult используется это выражение
-        // https://stackoverflow.com/questions/62671106/onactivityresult-method-is-deprecated-what-is-the-alternative
-        ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        imageUri = result.getData().getData();
-                        imageView.setImageURI(imageUri);
-                    }
-                });
+        viewPager2.setAdapter(adapter);
 
-        button.setOnClickListener((View v) -> {
-                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                someActivityResultLauncher.launch(gallery);
-        });
+        new TabLayoutMediator(
+                tabLayout,
+                viewPager2,
+                (tab, position) -> tab.setText(listTitle[position])
+        ).attach();
     }
 }
