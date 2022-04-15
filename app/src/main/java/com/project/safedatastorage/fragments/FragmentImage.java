@@ -24,11 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentImage extends Fragment {
-    View view;
-    private RecyclerView recyclerView;
-    private List<ImageItem> listImages;
-    Button addImage;
 
+    private List<ImageItem> listImages;
+    ImageViewAdapter adapter;
+
+    Button addImage;
+    View view;
 
     public FragmentImage() {
 
@@ -38,19 +39,17 @@ public class FragmentImage extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.image_fragment, container, false);
-        recyclerView = view.findViewById(R.id.recycler_image);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_image);
 
-        ImageViewAdapter adapter = new ImageViewAdapter(getContext(), listImages);
+        adapter = new ImageViewAdapter(getContext(), listImages);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
 
         addImage = view.findViewById(R.id.add_img_btn);
 
-        addImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        addImage.setOnClickListener(view ->  {
                 Toast.makeText(getContext(), "TEST MSG", Toast.LENGTH_LONG).show();
-            }
+                addItem();
         });
 
         return view;
@@ -62,15 +61,11 @@ public class FragmentImage extends Fragment {
 
         listImages = new ArrayList<>();
         listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
-        listImages.add(new ImageItem("TEST", "14kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null)));
+    }
+
+    public void addItem() {
+        ImageItem imageItem = new ImageItem("TEST2", "143kB", ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null));
+        listImages.add(imageItem);
+        adapter.notifyItemChanged(listImages.size());
     }
 }
