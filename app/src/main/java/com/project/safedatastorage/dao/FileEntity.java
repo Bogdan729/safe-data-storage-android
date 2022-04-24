@@ -12,8 +12,8 @@ public class FileEntity {
     @ColumnInfo(name = "file_name")
     public String fileName;
 
-    @ColumnInfo(name = "size", typeAffinity = ColumnInfo.INTEGER)
-    public int size;
+    @ColumnInfo(name = "size", typeAffinity = ColumnInfo.TEXT)
+    public String size;
 
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     public byte[] file;
@@ -26,7 +26,7 @@ public class FileEntity {
         return fileName;
     }
 
-    public int getSize() {
+    public String getSize() {
         return size;
     }
 

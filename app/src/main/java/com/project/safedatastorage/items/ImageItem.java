@@ -21,7 +21,7 @@ public class ImageItem {
 
     public ImageItem(FileEntity entity) {
         this.imageName = entity.getFileName();
-        this.imageSize = String.valueOf(entity.getSize()); // !!!!!!!!!!!!!!!!!!
+        this.imageSize = entity.getSize(); // !!!!!!!!!!!!!!!!!!
         this.image = DataConverter.convertBytesToImg(entity.getFile()); // !!!!!!!!!!!!!!!!!!
     }
 
