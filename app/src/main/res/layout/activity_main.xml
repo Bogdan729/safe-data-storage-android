@@ -16,5 +16,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         android:text="Test"
+        android:enabled="true"
         android:layout_gravity="center"/>
 </LinearLayout>

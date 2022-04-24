@@ -30,10 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.safedatastorage.ImageViewAdapter;
 import com.project.safedatastorage.R;
-import com.project.safedatastorage.dao.AppDatabase;
 import com.project.safedatastorage.dao.DataConverter;
-import com.project.safedatastorage.dao.FileDao;
-import com.project.safedatastorage.dao.FileEntity;
 import com.project.safedatastorage.items.ImageItem;
 import com.project.safedatastorage.util.FileUtil;
 
@@ -41,7 +38,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,12 +118,6 @@ public class FragmentImage extends Fragment {
                 byte[] fileContent = Files.readAllBytes(path);
                 @SuppressLint("DefaultLocale") String size = String.format("%,d MB", Files.size(path) / (1024));
                 String fileName = file.getName();
-
-                FileEntity fileEntity = new FileEntity();
-
-                fileEntity.size = size;
-                fileEntity.fileName = fileName;
-                fileEntity.file = fileContent;
 
 //                fileDao.insertAll(fileEntity);
             }

@@ -1,11 +1,9 @@
 package com.project.safedatastorage.items;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.project.safedatastorage.dao.DataConverter;
-import com.project.safedatastorage.dao.FileEntity;
 
 public class ImageItem {
     private String imageName;
@@ -17,12 +15,6 @@ public class ImageItem {
         this.imageName = imageName;
         this.imageSize = imageSize;
         this.image = image;
-    }
-
-    public ImageItem(FileEntity entity) {
-        this.imageName = entity.getFileName();
-        this.imageSize = entity.getSize(); // !!!!!!!!!!!!!!!!!!
-        this.image = DataConverter.convertBytesToImg(entity.getFile()); // !!!!!!!!!!!!!!!!!!
     }
 
     public String getImageName() {
