@@ -1,13 +1,17 @@
 package com.project.safedatastorage.items;
 
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
+import android.widget.ImageView;
+
+import com.project.safedatastorage.dao.DataConverter;
 
 public class ImageItem {
     private String imageName;
     private String imageSize;
-    private Drawable image;
+    private Bitmap image;
+    private ImageView imageView;
 
-    public ImageItem(String imageName, String imageSize, Drawable image) {
+    public ImageItem(String imageName, String imageSize, Bitmap image) {
         this.imageName = imageName;
         this.imageSize = imageSize;
         this.image = image;
@@ -29,11 +33,11 @@ public class ImageItem {
         this.imageSize = imageSize;
     }
 
-    public Drawable getImage() {
+    public Bitmap getImage() {
         return image;
     }
 
-    public void setImage(Drawable image) {
+    public void setImage(Bitmap image) {
         this.image = image;
     }
 }
