@@ -2,16 +2,13 @@ package com.project.safedatastorage.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,9 +51,7 @@ public class FragmentImage extends Fragment {
     Uri imageUri;
     Bitmap bitmap;
 
-    public FragmentImage() {
-
-    }
+    public FragmentImage() {}
 
     @Nullable
     @Override
@@ -76,13 +71,12 @@ public class FragmentImage extends Fragment {
 
 
         addImage.setOnClickListener(view -> {
-            //  Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            // Получение доступа ко ГАЛЕРЕИ
+            Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 
-//             Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-
-            Intent gallery = new Intent(Intent.ACTION_GET_CONTENT);
-            gallery.setType("*/*");
-
+            // Получение доступа ко ХРАНИЛИЩУ
+//            Intent gallery = new Intent(Intent.ACTION_GET_CONTENT);
+//            gallery.setType("*/*");
 
             activityResultLauncher.launch(gallery);
         });
@@ -108,84 +102,34 @@ public class FragmentImage extends Fragment {
     }
 
     public void saveFile(File file) {
-        // int size = 123;
-        // String fileName = "name";
-//        byte[] fileByteArr = DataConverter.convertImgToBytes(bitmap);
-
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 Path path = file.toPath();
-                byte[] fileContent = Files.readAllBytes(path);
-                @SuppressLint("DefaultLocale") String size = String.format("%,d MB", Files.size(path) / (1024));
+                @SuppressLint("DefaultLocale")
+                String size = String.format("%,d MB", Files.size(path) / (1024 * 1024));
                 String fileName = file.getName();
 
-//                fileDao.insertAll(fileEntity);
+                ImageItem item = new ImageItem(fileName, size, bitmap);
+                listImages.add(item);
+                adapter.notifyItemChanged(listImages.size());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // !!!!!!!!!!!!!!!! добавление элемента в адаптер. Отделить логику
-
-//        ImageItem imageItemTEST = new ImageItem(fileEntity);
-//        listImages.add(imageItemTEST);
-//        adapter.notifyItemChanged(listImages.size());
     }
-
-    public String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-
-        try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
 
     private void onActivityResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK) {
             imageUri = result.getData().getData();
-            Log.w(TAG, "onActivityResult: " + imageUri);
+
             try {
-                File file = FileUtil.from(getActivity(), imageUri);
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    byte[] fileContent = Files.readAllBytes(file.toPath());
-
-                }
-
-                Log.w(TAG, "File...:::: uti - " + file.getPath() + " file -" + file + " : " + file.exists());
-
-            } catch (IOException e) {
+                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
+                File itemFile = FileUtil.getFileFromUri(getContext(), imageUri);
+                saveFile(itemFile);
+                Toast.makeText(getContext(), "file saved", Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
-//            try {
-//                // bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
-//                 String path = getRealPathFromURI(getContext(), imageUri);
-//
-//                // Log.w(TAG, "onActivityResult: " + String.format("%,d MB", Files.size(p) / (1024)));
-//
-//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//                    Path p = Paths.get(path);
-//                    File file = new File(String.valueOf(p));
-//
-//                    Log.w(TAG, "onActivityResult: " + file.getName());
-//                    Log.w(TAG, "onActivityResult: " + String.format("%,d MB", Files.size(p) / (1024)));
-//                }
-//
-//                //saveFile();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-
-            Toast.makeText(getContext(), "file saved", Toast.LENGTH_LONG).show();
         }
     }
 }

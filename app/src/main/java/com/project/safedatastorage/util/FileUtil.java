@@ -18,11 +18,9 @@ public class FileUtil {
     private static final int EOF = -1;
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
-    private FileUtil() {
+    private FileUtil() {}
 
-    }
-
-    public static File from(Context context, Uri uri) throws IOException {
+    public static File getFileFromUri(Context context, Uri uri) throws IOException {
         InputStream inputStream = context.getContentResolver().openInputStream(uri);
         String fileName = getFileName(context, uri);
         String[] splitName = splitFileName(fileName);
