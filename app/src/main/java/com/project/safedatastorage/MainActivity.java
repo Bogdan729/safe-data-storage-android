@@ -4,45 +4,37 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.Manifest;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.project.safedatastorage.dao.DataConverter;
-import com.project.safedatastorage.fragments.FragmentFile;
-import com.project.safedatastorage.fragments.FragmentImage;
-import com.project.safedatastorage.fragments.FragmentVideo;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.security.Magma;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Base64;
-import java.util.List;
 
 import javax.crypto.SecretKey;
 
@@ -50,21 +42,51 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private TabLayout tabLayout;
-    private ViewPager2 viewPager2;
-    private ViewPagerAdapter adapter;
-    private EditText input;
-
-    String[] listTitle = {"Фото", "Документы", "Видео"};
+    public static final String HASH_FILE_NAME = "hash.txt";
 
     File internalStorage = new File(Environment.getExternalStorageDirectory().toString());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_test_fargments);
+        // setContentView(R.layout.activity_container);
 
-        // ТЕСТИРОВАНИЕ
+        if (isDefaultDirExists()) {
+            Intent LoginIntent = new Intent("com.project.safedatastorage.LoginActivity");
+            startActivity(LoginIntent);
+        } else {
+            Intent RegistrationIntent = new Intent("com.project.safedatastorage.RegistrationActivity");
+            startActivity(RegistrationIntent);
+        }
+
+        // ТЕСТИРОВАНИЕ ИНИЦИАЛИЗАЦИИ ХРАНИЛИЩА
+
+//        setPasswordBtn.setOnClickListener(view -> {
+//            Intent intent = new Intent("com.project.safedatastorage.RegistrationActivity");
+//            startActivity(intent);
+
+//                try {
+//                    String password = setPasswordEditText.getText().toString();
+//
+//                    setPasswordEditText.getText().clear();
+//                    repeatPasswordEditText.getText().clear();
+//
+//                    keyObj = new Key(password);
+//                    SecretKey secretKey = keyObj.getSecretKey();
+//                    String message = "test";
+//
+//                    byte[] cipherText = Magma.encrypt(secretKey, message.getBytes());
+//                    Log.d(TAG, "onCreate: " + new String(cipherText));
+//
+//                    byte[] decodedText = Magma.decrypt(secretKey, cipherText);
+//                    Log.d(TAG, "onCreate: " + new String(decodedText));
+//                } catch (GeneralSecurityException e) {
+//                    e.printStackTrace();
+//                }
+
+//        });
+
+        // ТЕСТИРОВАНИЕ ГЕНЕРАЦИИ КЛЮЧА НА ОСНОВЕ ВВЕДЕННОГО ПАРОЛЯ
 
 //        setContentView(R.layout.activity_main);
 //
@@ -92,57 +114,71 @@ public class MainActivity extends AppCompatActivity {
 
         // ОСНОВНАЯ ЛОГИКА
 
-        tabLayout = findViewById(R.id.tab_layout);
-        viewPager2 = findViewById(R.id.view_pager);
-
-        adapter = new ViewPagerAdapter(this);
-        adapter.addFragment(new FragmentImage());
-        adapter.addFragment(new FragmentFile());
-        adapter.addFragment(new FragmentVideo());
-
-        viewPager2.setAdapter(adapter);
-
-        new TabLayoutMediator(
-                tabLayout,
-                viewPager2,
-                (tab, position) -> tab.setText(listTitle[position])
-        ).attach();
     }
 
-    void creteDefaultDir() {
+    public boolean isDefaultDirExists() {
         File dir = new File(Environment.getExternalStorageDirectory().toString() + "/DataStorage");
 
-        if (!dir.exists()) {
-            dir.mkdir();
-
-            if (dir.isDirectory()) {
-                File images = new File(dir, "images");
-                File documents = new File(dir, "documents");
-                File video = new File(dir, "video");
-                File audio = new File(dir, "audio");
-
-                images.mkdir();
-                documents.mkdir();
-                video.mkdir();
-                audio.mkdir();
-
-                Log.d(TAG, "creteDefaultDir: Directory created");
-            } else {
-                Log.d(TAG, "creteDefaultDir: Error -> Directory isn't created");
-            }
-        }
+        return dir.exists();
     }
 
+    // ТЕСТОВЫЕ МЕТОДЫ
 
-        // ТЕСТОВЫЕ МЕТОДЫ
+    public boolean deleteHashFile() {
+        File file = new File(getFilesDir() + "/" + HASH_FILE_NAME);
+        boolean deleted = false;
 
+        if (file.delete())
+            deleted = true;
+
+        return deleted;
+    }
+
+    public byte[] readHash(View v) {
+        byte[] hash = null;
+
+        try {
+            File hashFile = new File(getFilesDir() + "/" + HASH_FILE_NAME);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                hash = Files.readAllBytes(hashFile.toPath());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return hash;
+//        try {
+//            fis = openFileInput(HASH_FILE_NAME);
+//            InputStreamReader isr = new InputStreamReader(fis);
+//            BufferedReader br = new BufferedReader(isr);
+//            String hash;
+//
+//            while ((hash = br.readLine()) != null) {
+//                sb.append(hash).append("\n");
+//            }
+//
+//            return sb.toString();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (fis != null) {
+//                try {
+//                    fis.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+
+//        return sb.toString();
+    }
 
     void testEncAndDec() {
 
         long time = System.nanoTime();
 
         try {
-            Key keyObj = new Key(input.getText().toString());
+            Key keyObj = new Key("test");
             SecretKey key = keyObj.getSecretKey();
 
             Drawable drawable = ContextCompat.getDrawable(MainActivity.this, R.drawable.ic_image);

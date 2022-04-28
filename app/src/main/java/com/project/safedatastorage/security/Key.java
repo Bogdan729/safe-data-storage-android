@@ -3,6 +3,7 @@ package com.project.safedatastorage.security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
@@ -29,13 +30,22 @@ public class Key {
         secretKey = getSecretKey(this.password);
     }
 
-    public static SecretKey getSecretKey(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        SecretKeyFactory keyFact = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256", provider);
+    public SecretKey getSecretKey(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+        SecretKeyFactory keyFact = SecretKeyFactory.getInstance("PBKDF2withHmacGOST3411", provider);
         SecretKey hmacKey = keyFact.generateSecret(new PBEKeySpec(password.toCharArray(),
                 Hex.decode("0102030405060708090a0b0c0d0e0f10"),
                 1024,
                 256));
         return new SecretKeySpec(hmacKey.getEncoded(), "GOST28147");
+    }
+
+    public static byte[] getPasswordHash512(String password) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException  {
+        SecretKeyFactory keyFact = SecretKeyFactory.getInstance("PBKDF2withHmacGOST3411", provider);
+        SecretKey hmacKey = keyFact.generateSecret(new PBEKeySpec(password.toCharArray(),
+                Hex.decode("0102030405060708090a0b0c0d0e0f10"),
+                1024,
+                512));
+        return hmacKey.getEncoded();
     }
 
     public SecretKey getSecretKey() {
