@@ -1,6 +1,7 @@
 package com.project.safedatastorage;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
@@ -11,8 +12,11 @@ import com.project.safedatastorage.adapter.ViewPagerAdapter;
 import com.project.safedatastorage.fragments.FragmentFile;
 import com.project.safedatastorage.fragments.FragmentImage;
 import com.project.safedatastorage.fragments.FragmentVideo;
+import com.project.safedatastorage.security.Key;
 
 public class ContainerActivity extends AppCompatActivity {
+
+    private static final String TAG = "ContainerActivity";
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
@@ -25,11 +29,16 @@ public class ContainerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_container);
 
+        Bundle keyArgument = getIntent().getExtras();
+        Key keyObj =  (Key) keyArgument.get("key");
+
+        Log.d(TAG, "onCreate: CREATED KEY");
+
         tabLayout = findViewById(R.id.tab_layout);
         viewPager2 = findViewById(R.id.view_pager);
 
         adapter = new ViewPagerAdapter(this);
-        adapter.addFragment(new FragmentImage());
+        adapter.addFragment(new FragmentImage(keyObj));
         adapter.addFragment(new FragmentFile());
         adapter.addFragment(new FragmentVideo());
 

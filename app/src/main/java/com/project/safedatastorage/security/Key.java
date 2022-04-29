@@ -3,6 +3,7 @@ package com.project.safedatastorage.security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -14,7 +15,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class Key {
+public class Key implements Serializable {
     public static final String provider = BouncyCastleProvider.PROVIDER_NAME;
 
     final SecretKey secretKey;

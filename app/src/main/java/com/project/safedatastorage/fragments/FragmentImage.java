@@ -29,6 +29,7 @@ import com.project.safedatastorage.adapter.ImageViewAdapter;
 import com.project.safedatastorage.R;
 import com.project.safedatastorage.dao.DataConverter;
 import com.project.safedatastorage.items.ImageItem;
+import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
 
 import java.io.File;
@@ -43,6 +44,7 @@ public class FragmentImage extends Fragment {
     final String TAG = "FragmentImage";
 
     private List<ImageItem> listImages;
+    private Key key;
     ImageViewAdapter adapter;
 
     Button addImage;
@@ -52,6 +54,10 @@ public class FragmentImage extends Fragment {
     Bitmap bitmap;
 
     public FragmentImage() {}
+
+    public FragmentImage(Key key) {
+        this.key = key;
+    }
 
     @Nullable
     @Override
@@ -106,7 +112,7 @@ public class FragmentImage extends Fragment {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 Path path = file.toPath();
                 @SuppressLint("DefaultLocale")
-                String size = String.format("%,d MB", Files.size(path) / (1024 * 1024));
+                String size = String.format("%,d KB", Files.size(path) / (1024));
                 String fileName = file.getName();
 
                 ImageItem item = new ImageItem(fileName, size, bitmap);

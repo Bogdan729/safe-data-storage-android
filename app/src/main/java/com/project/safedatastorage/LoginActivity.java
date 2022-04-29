@@ -3,6 +3,7 @@ package com.project.safedatastorage;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d(TAG, "password secret key " + new String(keyObj.getSecretKey().getEncoded()));
 
                         Intent intent = new Intent("com.project.safedatastorage.ContainerActivity");
+                        intent.putExtra("key", keyObj);
                         startActivity(intent);
                     } else {
                         passwordEntry.setError("Неверный пароль");
