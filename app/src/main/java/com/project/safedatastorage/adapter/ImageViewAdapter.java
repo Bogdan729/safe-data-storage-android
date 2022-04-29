@@ -1,4 +1,4 @@
-package com.project.safedatastorage;
+package com.project.safedatastorage.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.project.safedatastorage.R;
 import com.project.safedatastorage.items.ImageItem;
 
 import java.util.List;

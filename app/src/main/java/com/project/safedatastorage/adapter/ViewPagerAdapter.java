@@ -1,4 +1,4 @@
-package com.project.safedatastorage;
+package com.project.safedatastorage.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

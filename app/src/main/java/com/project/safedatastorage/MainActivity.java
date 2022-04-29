@@ -49,15 +49,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // setContentView(R.layout.activity_container);
+        setContentView(R.layout.activity_main);
 
-        if (isDefaultDirExists()) {
-            Intent LoginIntent = new Intent("com.project.safedatastorage.LoginActivity");
-            startActivity(LoginIntent);
-        } else {
-            Intent RegistrationIntent = new Intent("com.project.safedatastorage.RegistrationActivity");
-            startActivity(RegistrationIntent);
-        }
+        Intent LoginIntent = new Intent("com.project.safedatastorage.ContainerActivity");
+        startActivity(LoginIntent);
+
+//        if (isDefaultDirExists()) {
+//            Intent LoginIntent = new Intent("com.project.safedatastorage.LoginActivity");
+//            startActivity(LoginIntent);
+//        } else {
+//            Intent RegistrationIntent = new Intent("com.project.safedatastorage.RegistrationActivity");
+//            startActivity(RegistrationIntent);
+//        }
 
         // ТЕСТИРОВАНИЕ ИНИЦИАЛИЗАЦИИ ХРАНИЛИЩА
 

@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.project.safedatastorage.ImageViewAdapter;
+import com.project.safedatastorage.adapter.ImageViewAdapter;
 import com.project.safedatastorage.R;
 import com.project.safedatastorage.dao.DataConverter;
 import com.project.safedatastorage.items.ImageItem;
