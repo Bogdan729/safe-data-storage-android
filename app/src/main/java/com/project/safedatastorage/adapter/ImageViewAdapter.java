@@ -1,6 +1,8 @@
 package com.project.safedatastorage.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +39,6 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.imgName.setText(imageItemList.get(position).getImageName());
         holder.imgSize.setText(imageItemList.get(position).getImageSize());
-//        holder.imgView.setImageBitmap();
         holder.imgView.setImageBitmap(imageItemList.get(position).getImage());
     }
 
