@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,17 +38,16 @@ import com.project.safedatastorage.dao.DataConverter;
 import com.project.safedatastorage.items.ImageItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
+import com.project.safedatastorage.util.ImageUtil;
+import com.project.safedatastorage.writer.ImageRW;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,10 +60,11 @@ import static android.media.ExifInterface.TAG_ORIENTATION;
 public class FragmentImage extends Fragment {
 
     final String TAG = "FragmentImage";
-    File internalStorage = new File(Environment.getExternalStorageDirectory().toString());
 
     private List<ImageItem> listImages;
     private Key key;
+    private ImageRW imageRW;
+
     ImageViewAdapter adapter;
 
     Button addImage;
@@ -77,11 +80,14 @@ public class FragmentImage extends Fragment {
         this.key = key;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.image_fragment, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_image);
+
+        imageRW = new ImageRW(this.getContext(), key);
 
         adapter = new ImageViewAdapter(getContext(), listImages);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -141,7 +147,7 @@ public class FragmentImage extends Fragment {
 
             String fileName = file.getName();
 
-            int necessaryRotation = getFileExifRotation(file);
+            int necessaryRotation = FileUtil.getFileExifRotation(file);
 
             Matrix matrix = new Matrix();
             matrix.postRotate(necessaryRotation);
@@ -155,21 +161,46 @@ public class FragmentImage extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void onActivityResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK) {
             imageUri = result.getData().getData();
 
             try {
 
-                bitmap = getThumbnail(imageUri);
-                fileItem = FileUtil.getFileFromUri(getContext(), imageUri);
-                saveFile(fileItem);
+//                bitmap = getThumbnail(imageUri);
+//                fileItem = FileUtil.getFileFromUri(getContext(), imageUri);
+//                ImageUtil.saveFileToInternalStorage(fileItem);
 
-                // сохранение на устройство
-                 saveFileToInternalStorage();
+
+                // шифрование с сохранение фото в хранилище
+//                imageRW.writeToInternalStorage(fileItem);
+                
+                // получение временных  расшифрованных файлов 
+                List<File> filesDec = imageRW.readFromInternalStorage();
+
+                Log.d(TAG, "onActivityResult: " + filesDec.get(0).getName() + "path " + filesDec.get(0).getAbsolutePath());
+
+                if (filesDec.get(0).exists()) {
+                    Bitmap bit = DataConverter.convertBytesToImg(Files.readAllBytes(filesDec.get(0).toPath()));
+                    System.out.println("HEIGHT " + bit.getHeight());
+                }
+
+//                bitmap = ImageUtil.getThumbnail(filesDec.get(0));
+                
+                // конвертация файла в битмап
+
+//                File file = new File(Environment.getExternalStorageDirectory().getPath() + "/DataStorage/images/dec_20211011_160301.jpg");
+//
+//                System.out.println("File size : " + Files.size(file.toPath()));
+//
+//                if (file.exists()) {
+//                    Bitmap bit = DataConverter.convertBytesToImg(Files.readAllBytes(file.toPath()));
+//
+//                    System.out.println("HEIGHT " + bit.getHeight());
+//                }
 
                 Toast.makeText(getContext(), "file saved", Toast.LENGTH_LONG).show();
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -178,99 +209,4 @@ public class FragmentImage extends Fragment {
 
     // ТЕСТРОВЫЕ МЕТОДЫ
 
-    // работает
-    static int getFileExifRotation(File file) {
-        ExifInterface exifInterface = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            try {
-                exifInterface = new ExifInterface(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        int orientation = exifInterface.getAttributeInt(TAG_ORIENTATION, ORIENTATION_NORMAL);
-        switch (orientation) {
-            case ORIENTATION_ROTATE_90:
-                return 90;
-            case ORIENTATION_ROTATE_180:
-                return 180;
-            case ORIENTATION_ROTATE_270:
-                return 270;
-            default:
-                return 0;
-        }
-    }
-
-    // метод сохранения изображения в хранилище
-    public void saveFileToInternalStorage() {
-        FileOutputStream fos;
-        BufferedOutputStream bos;
-
-        try {
-            File file = new File(internalStorage.getPath() + "/DataStorage/images", fileItem.getName());
-
-            fos = new FileOutputStream(file);
-            bos = new BufferedOutputStream(fos);
-
-            FileInputStream fis = new FileInputStream(fileItem);
-
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-
-            final int BUFFER = 1024;
-            int count;
-            byte data[] = new byte[BUFFER];
-
-            while ((count = fis.read(data, 0, BUFFER)) != -1) {
-                bos.write(data, 0, count);
-            }
-
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                bos.write(Files.readAllBytes(file.toPath()));
-//            }
-
-            bos.flush();
-            bos.close();
-
-            MediaStore.Images.Media.insertImage(getContext().getContentResolver(), file.getAbsolutePath(), file.getName(), file.getName());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    // решает проблему подвисания recycler view
-    public Bitmap getThumbnail(Uri uri) throws IOException{
-        InputStream input = getContext().getContentResolver().openInputStream(uri);
-
-        BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
-        onlyBoundsOptions.inJustDecodeBounds = true;
-        onlyBoundsOptions.inDither=true; //optional
-        onlyBoundsOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
-        BitmapFactory.decodeStream(input, null, onlyBoundsOptions);
-        input.close();
-
-        if ((onlyBoundsOptions.outWidth == -1) || (onlyBoundsOptions.outHeight == -1)) {
-            return null;
-        }
-
-        int originalSize = (onlyBoundsOptions.outHeight > onlyBoundsOptions.outWidth) ? onlyBoundsOptions.outHeight : onlyBoundsOptions.outWidth;
-
-        double ratio = (originalSize > 200) ? (originalSize / 200) : 1.0;
-
-        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-        bitmapOptions.inSampleSize = getPowerOfTwoForSampleRatio(ratio);
-        bitmapOptions.inDither = true; //optional
-        bitmapOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//
-        input = getContext().getContentResolver().openInputStream(uri);
-        Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
-        input.close();
-        return bitmap;
-    }
-
-    private static int getPowerOfTwoForSampleRatio(double ratio){
-        int k = Integer.highestOneBit((int)Math.floor(ratio));
-        if(k==0) return 1;
-        else return k;
-    }
 }
