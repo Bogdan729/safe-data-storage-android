@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.safedatastorage.adapter.ImageViewAdapter;
 import com.project.safedatastorage.R;
+import com.project.safedatastorage.adapter.RVEmptyObserver;
 import com.project.safedatastorage.items.ImageItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
@@ -64,28 +65,35 @@ public class FragmentImage extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.image_fragment, container, false);
+        View emptyView = new View(getContext());
+
         RecyclerView recyclerView = view.findViewById(R.id.recycler_image);
-
         adapter = new ImageViewAdapter(getContext(), listImages);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(adapter);
 
-        addImage = view.findViewById(R.id.add_img_btn);
+        if (listImages == null) {
+            RVEmptyObserver observer = new RVEmptyObserver(recyclerView, emptyView);
+            adapter.registerAdapterDataObserver(observer);
+        } else {
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recyclerView.setAdapter(adapter);
 
-        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                this::onActivityResult);
+            addImage = view.findViewById(R.id.add_img_btn);
 
-        addImage.setOnClickListener(view -> {
-            // Получение доступа ко ГАЛЕРЕИ
-            Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    this::onActivityResult);
 
-            // Получение доступа ко ХРАНИЛИЩУ
+            addImage.setOnClickListener(view -> {
+                // Получение доступа ко ГАЛЕРЕИ
+                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+
+                // Получение доступа ко ХРАНИЛИЩУ
 //            Intent gallery = new Intent(Intent.ACTION_GET_CONTENT);
 //            gallery.setType("*/*");
 
-            activityResultLauncher.launch(gallery);
-        });
+                activityResultLauncher.launch(gallery);
+            });
+        }
 
         return view;
     }
@@ -118,9 +126,6 @@ public class FragmentImage extends Fragment {
                 }
             }
         }
-
-//        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null);
-//        listImages.add(new ImageItem("test", "test", DataConverter.drawableToBitmap(drawable)));
     }
 
     public void saveFile(Uri uri) {
