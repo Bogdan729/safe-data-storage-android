@@ -36,6 +36,7 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.imgName.setText(imageItemList.get(position).getImageName());
+        holder.imgName.setSelected(true);
         holder.imgSize.setText(imageItemList.get(position).getImageSize());
         holder.imgView.setImageBitmap(imageItemList.get(position).getImage());
     }

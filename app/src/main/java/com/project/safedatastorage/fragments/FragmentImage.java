@@ -54,6 +54,7 @@ public class FragmentImage extends Fragment {
     Uri imageUri;
 
     public FragmentImage() {
+
     }
 
     public FragmentImage(Key key) {

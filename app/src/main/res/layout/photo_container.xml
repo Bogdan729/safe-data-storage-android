@@ -41,6 +41,7 @@
                 android:scrollHorizontally="true"
                 android:textAlignment="gravity"
                 android:gravity="center_vertical"
+                android:singleLine="true"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:padding="5dp"
                 android:text="Image Name">
