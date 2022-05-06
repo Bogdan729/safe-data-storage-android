@@ -16,12 +16,7 @@ import java.nio.file.Files;
 
 public class ImageUtil {
 
-
-    // решает проблему подвисания recycler view
     public static Bitmap getThumbnail(File file) throws IOException {
-        // при работе с файлом заменить input stream
-//        InputStream input = getContext().getContentResolver().openInputStream(uri);
-
         ByteArrayInputStream input = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             input = new ByteArrayInputStream(Files.readAllBytes(file.toPath()));
@@ -58,62 +53,6 @@ public class ImageUtil {
         int k = Integer.highestOneBit((int) Math.floor(ratio));
         if (k == 0) return 1;
         else return k;
-    }
-
-    public static Bitmap decodeFile(File f) {
-        try {
-            //decode image size
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            o.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(new FileInputStream(f), null, o);
-
-            //Find the correct scale value. It should be the power of 2.
-            final int REQUIRED_SIZE = 256;
-            int width_tmp = o.outWidth, height_tmp = o.outHeight;
-            int scale = 1;
-            while (true) {
-                if (width_tmp / 2 < REQUIRED_SIZE || height_tmp / 2 < REQUIRED_SIZE)
-                    break;
-                width_tmp /= 2;
-                height_tmp /= 2;
-                scale *= 2;
-            }
-
-            //decode with inSampleSize
-            BitmapFactory.Options o2 = new BitmapFactory.Options();
-            o2.inSampleSize = scale;
-            return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void saveFileToInternalStorage(File fileItem) {
-        FileOutputStream fos;
-        BufferedOutputStream bos;
-
-        try {
-            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/DataStorage/images", fileItem.getName());
-
-            fos = new FileOutputStream(file);
-            bos = new BufferedOutputStream(fos);
-
-            FileInputStream fis = new FileInputStream(fileItem);
-
-            final int BUFFER = 1024;
-            int count;
-            byte data[] = new byte[BUFFER];
-
-            while ((count = fis.read(data, 0, BUFFER)) != -1) {
-                bos.write(data, 0, count);
-            }
-
-            bos.flush();
-            bos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static Bitmap rotateImage(Bitmap bitmap, int rotation) {

@@ -3,8 +3,6 @@ package com.project.safedatastorage.items;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
-import com.project.safedatastorage.dao.DataConverter;
-
 public class ImageItem {
     private String imageName;
     private String imageSize;

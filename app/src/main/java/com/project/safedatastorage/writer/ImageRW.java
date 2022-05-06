@@ -1,10 +1,7 @@
 package com.project.safedatastorage.writer;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Environment;
-
-import androidx.annotation.RequiresApi;
 
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.security.Magma;
@@ -12,9 +9,7 @@ import com.project.safedatastorage.util.FileUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
