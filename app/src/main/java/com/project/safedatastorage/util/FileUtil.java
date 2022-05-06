@@ -135,4 +135,19 @@ public class FileUtil {
                 return 0;
         }
     }
+
+    @SuppressLint("DefaultLocale")
+    public static String getFormattedFileSize(long length) {
+        String size = "";
+
+        if (length > 1024 && length < (1024 * 1024)) {
+            size = String.format("%,d Kb", length / (1024));
+        } else if (length > 1024 * 1024) {
+            size = String.format("%,d Mb", length / (1024 * 1024));
+        } else {
+            size = String.format("%,d byte", length);
+        }
+
+        return size;
+    }
 }

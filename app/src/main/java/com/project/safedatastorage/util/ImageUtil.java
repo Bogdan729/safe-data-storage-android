@@ -2,6 +2,7 @@ package com.project.safedatastorage.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Environment;
 
 import java.io.BufferedOutputStream;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class ImageUtil {
+
 
     // решает проблему подвисания recycler view
     public static Bitmap getThumbnail(File file) throws IOException {
@@ -66,7 +68,7 @@ public class ImageUtil {
             BitmapFactory.decodeStream(new FileInputStream(f), null, o);
 
             //Find the correct scale value. It should be the power of 2.
-            final int REQUIRED_SIZE = 150;
+            final int REQUIRED_SIZE = 256;
             int width_tmp = o.outWidth, height_tmp = o.outHeight;
             int scale = 1;
             while (true) {
@@ -112,5 +114,13 @@ public class ImageUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Bitmap rotateImage(Bitmap bitmap, int rotation) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(rotation);
+
+        return Bitmap.createBitmap(bitmap, 0, 0,
+                bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 }
