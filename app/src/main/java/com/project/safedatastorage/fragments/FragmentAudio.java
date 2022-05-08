@@ -11,17 +11,17 @@ import androidx.fragment.app.Fragment;
 
 import com.project.safedatastorage.R;
 
-public class FragmentFile extends Fragment {
+public class FragmentAudio extends Fragment {
     View view;
 
-    public FragmentFile() {
+    public FragmentAudio() {
 
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.video_fragment, container, false);
+        view = inflater.inflate(R.layout.audio_fragment, container, false);
         return view;
     }
 }
