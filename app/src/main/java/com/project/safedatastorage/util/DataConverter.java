@@ -1,4 +1,4 @@
-package com.project.safedatastorage.dao;
+package com.project.safedatastorage.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
