@@ -1,8 +1,15 @@
 package com.project.safedatastorage.util;
 
+import static android.media.ExifInterface.ORIENTATION_NORMAL;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_180;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_270;
+import static android.media.ExifInterface.ORIENTATION_ROTATE_90;
+import static android.media.ExifInterface.TAG_ORIENTATION;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.util.Log;
@@ -44,7 +51,7 @@ public class FileUtil {
         return tempFile;
     }
 
-    private static String[] splitFileName(String fileName) {
+    public static String[] splitFileName(String fileName) {
         String name = fileName;
         String extension = "";
         int i = fileName.lastIndexOf(".");
@@ -96,7 +103,7 @@ public class FileUtil {
         return newFile;
     }
 
-    private static long copy(InputStream input, OutputStream output) throws IOException {
+    public static long copy(InputStream input, OutputStream output) throws IOException {
         long count = 0;
         int n;
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
@@ -105,5 +112,42 @@ public class FileUtil {
             count += n;
         }
         return count;
+    }
+
+    public static int getFileExifRotation(File file) {
+        ExifInterface exifInterface = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            try {
+                exifInterface = new ExifInterface(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        int orientation = exifInterface.getAttributeInt(TAG_ORIENTATION, ORIENTATION_NORMAL);
+        switch (orientation) {
+            case ORIENTATION_ROTATE_90:
+                return 90;
+            case ORIENTATION_ROTATE_180:
+                return 180;
+            case ORIENTATION_ROTATE_270:
+                return 270;
+            default:
+                return 0;
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    public static String getFormattedFileSize(long length) {
+        String size = "";
+
+        if (length > 1024 && length < (1024 * 1024)) {
+            size = String.format("%,d Kb", length / (1024));
+        } else if (length > 1024 * 1024) {
+            size = String.format("%,d Mb", length / (1024 * 1024));
+        } else {
+            size = String.format("%,d byte", length);
+        }
+
+        return size;
     }
 }

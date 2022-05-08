@@ -1,12 +1,10 @@
 package com.project.safedatastorage.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -20,21 +18,23 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.project.safedatastorage.ImageViewAdapter;
+import com.project.safedatastorage.adapter.ImageViewAdapter;
 import com.project.safedatastorage.R;
-import com.project.safedatastorage.dao.DataConverter;
+import com.project.safedatastorage.adapter.RVEmptyObserver;
 import com.project.safedatastorage.items.ImageItem;
+import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
+import com.project.safedatastorage.util.ImageUtil;
+import com.project.safedatastorage.writer.ImageRW;
+
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,43 +43,58 @@ public class FragmentImage extends Fragment {
     final String TAG = "FragmentImage";
 
     private List<ImageItem> listImages;
+    private Key key;
+    private ImageRW imageRW;
+
     ImageViewAdapter adapter;
 
     Button addImage;
     View view;
 
     Uri imageUri;
-    Bitmap bitmap;
 
-    public FragmentImage() {}
+    public FragmentImage() {
 
+    }
+
+    public FragmentImage(Key key) {
+        this.key = key;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.image_fragment, container, false);
+        View emptyView = new View(getContext());
+
         RecyclerView recyclerView = view.findViewById(R.id.recycler_image);
-
         adapter = new ImageViewAdapter(getContext(), listImages);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(adapter);
 
-        addImage = view.findViewById(R.id.add_img_btn);
+        if (listImages == null) {
+            RVEmptyObserver observer = new RVEmptyObserver(recyclerView, emptyView);
+            adapter.registerAdapterDataObserver(observer);
+        } else {
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recyclerView.setAdapter(adapter);
 
-        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                this::onActivityResult);
+            addImage = view.findViewById(R.id.add_img_btn);
 
+            ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    this::onActivityResult);
 
-        addImage.setOnClickListener(view -> {
-            // Получение доступа ко ГАЛЕРЕИ
-            Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            addImage.setOnClickListener(view -> {
+                // Получение доступа ко ГАЛЕРЕИ
+                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 
-            // Получение доступа ко ХРАНИЛИЩУ
+                // Получение доступа ко ХРАНИЛИЩУ
 //            Intent gallery = new Intent(Intent.ACTION_GET_CONTENT);
 //            gallery.setType("*/*");
 
-            activityResultLauncher.launch(gallery);
-        });
+                activityResultLauncher.launch(gallery);
+            });
+        }
 
         return view;
     }
@@ -88,28 +103,47 @@ public class FragmentImage extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_image_item, null);
+        imageRW = new ImageRW(this.getContext(), key);
 
         listImages = new ArrayList<>();
-        listImages.add(new ImageItem("test", "test", DataConverter.drawableToBitmap(drawable)));
+        List<File> decryptedImages = imageRW.readFromInternalStorage();
+
+        if (decryptedImages != null) {
+            for (File imageFile : decryptedImages) {
+                try {
+                    Bitmap bitImage = ImageUtil.getThumbnail(imageFile);
+                    String name = imageFile.getName();
+                    String size = FileUtil.getFormattedFileSize(imageFile.length());
+
+                    int necessaryRotation = FileUtil.getFileExifRotation(imageFile);
+
+                    Bitmap resultImage = ImageUtil.rotateImage(bitImage, necessaryRotation);
+
+                    ImageItem imageItem = new ImageItem(name, size, resultImage);
+
+                    listImages.add(imageItem);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
-    public void addItem() {
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_image_item);
-        ImageItem imageItem = new ImageItem("TEST2", "143kB", icon);
-        listImages.add(imageItem);
-        adapter.notifyItemChanged(listImages.size());
-    }
-
-    public void saveFile(File file) {
+    public void saveFile(Uri uri) {
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                Path path = file.toPath();
-                @SuppressLint("DefaultLocale")
-                String size = String.format("%,d MB", Files.size(path) / (1024 * 1024));
+                File file = FileUtil.getFileFromUri(getContext(), uri);
+                imageRW.writeToInternalStorage(file);
+
+                Bitmap bitmap = ImageUtil.getThumbnail(file);
+                String size = FileUtil.getFormattedFileSize(file.length());
                 String fileName = file.getName();
 
-                ImageItem item = new ImageItem(fileName, size, bitmap);
+                int necessaryRotation = FileUtil.getFileExifRotation(file);
+
+                Bitmap result = ImageUtil.rotateImage(bitmap, necessaryRotation);
+                ImageItem item = new ImageItem(fileName, size, result);
+
                 listImages.add(item);
                 adapter.notifyItemChanged(listImages.size());
             }
@@ -118,18 +152,16 @@ public class FragmentImage extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void onActivityResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK) {
             imageUri = result.getData().getData();
+            saveFile(imageUri);
 
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
-                File itemFile = FileUtil.getFileFromUri(getContext(), imageUri);
-                saveFile(itemFile);
-                Toast.makeText(getContext(), "file saved", Toast.LENGTH_LONG).show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Toast.makeText(getContext(), "file saved", Toast.LENGTH_LONG).show();
         }
     }
+
+    // ТЕСТРОВЫЕ МЕТОДЫ
+
 }

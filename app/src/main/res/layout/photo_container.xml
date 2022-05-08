@@ -16,8 +16,8 @@
 
         <ImageView
             android:id="@+id/photo_img_view"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="49dp"
+            android:layout_height="49dp"
             android:src="@drawable/ic_image"
             android:layout_gravity="center"
             android:layout_margin="8dp">
@@ -41,6 +41,7 @@
                 android:scrollHorizontally="true"
                 android:textAlignment="gravity"
                 android:gravity="center_vertical"
+                android:singleLine="true"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:padding="5dp"
                 android:text="Image Name">

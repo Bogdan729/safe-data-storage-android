@@ -54,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d(TAG, "password secret key " + new String(keyObj.getSecretKey().getEncoded()));
 
                         Intent intent = new Intent("com.project.safedatastorage.ContainerActivity");
+                        intent.putExtra("key", keyObj);
                         startActivity(intent);
                     } else {
                         passwordEntry.setError("Неверный пароль");

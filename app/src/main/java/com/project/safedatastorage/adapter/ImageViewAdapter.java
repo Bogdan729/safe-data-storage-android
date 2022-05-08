@@ -1,4 +1,4 @@
-package com.project.safedatastorage;
+package com.project.safedatastorage.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.project.safedatastorage.R;
 import com.project.safedatastorage.items.ImageItem;
 
 import java.util.List;
@@ -35,8 +36,8 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.imgName.setText(imageItemList.get(position).getImageName());
+        holder.imgName.setSelected(true);
         holder.imgSize.setText(imageItemList.get(position).getImageSize());
-//        holder.imgView.setImageBitmap();
         holder.imgView.setImageBitmap(imageItemList.get(position).getImage());
     }
 
