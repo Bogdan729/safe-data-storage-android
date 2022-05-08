@@ -9,7 +9,8 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.project.safedatastorage.adapter.ViewPagerAdapter;
-import com.project.safedatastorage.fragments.FragmentFile;
+import com.project.safedatastorage.fragments.FragmentAudio;
+import com.project.safedatastorage.fragments.FragmentDocument;
 import com.project.safedatastorage.fragments.FragmentImage;
 import com.project.safedatastorage.fragments.FragmentVideo;
 import com.project.safedatastorage.security.Key;
@@ -22,7 +23,7 @@ public class ContainerActivity extends AppCompatActivity {
     private ViewPager2 viewPager2;
     private ViewPagerAdapter adapter;
 
-    String[] listTitle = {"Фото", "Документы", "Видео"};
+    String[] listTitle = {"Фото", "Видео", "Файлы", "Аудио"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +40,9 @@ public class ContainerActivity extends AppCompatActivity {
 
         adapter = new ViewPagerAdapter(this);
         adapter.addFragment(new FragmentImage(keyObj));
-        adapter.addFragment(new FragmentFile());
         adapter.addFragment(new FragmentVideo());
+        adapter.addFragment(new FragmentDocument());
+        adapter.addFragment(new FragmentAudio());
 
         viewPager2.setAdapter(adapter);
 

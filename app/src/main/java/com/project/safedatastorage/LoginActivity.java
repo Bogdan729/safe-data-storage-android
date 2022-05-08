@@ -51,7 +51,6 @@ public class LoginActivity extends AppCompatActivity {
 
                         // Передать секретный ключ в контейнер
                         Log.d(TAG, "pass correct!");
-                        Log.d(TAG, "password secret key " + new String(keyObj.getSecretKey().getEncoded()));
 
                         Intent intent = new Intent("com.project.safedatastorage.ContainerActivity");
                         intent.putExtra("key", keyObj);
