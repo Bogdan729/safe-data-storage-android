@@ -46,7 +46,7 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.View
         return imageItemList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         private TextView imgName, imgSize;
         private CardView container;
         private ImageView imgView;
