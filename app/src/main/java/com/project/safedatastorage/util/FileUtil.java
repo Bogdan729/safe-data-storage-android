@@ -9,10 +9,14 @@ import static android.media.ExifInterface.TAG_ORIENTATION;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.media.ExifInterface;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.CancellationSignal;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.util.Size;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +28,8 @@ import java.io.OutputStream;
 public class FileUtil {
     private static final int EOF = -1;
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    private final static int THUMBNAIL_HEIGHT = 200;
+    private final static int THUMBNAIL_WIDTH = 200;
 
     private FileUtil() {}
 
@@ -149,5 +155,21 @@ public class FileUtil {
         }
 
         return size;
+    }
+
+    public static Bitmap createVideoThumbnailFromFile(File videoFile) {
+        Bitmap bitmapThumbnail = null;
+        Size mSize = new Size(THUMBNAIL_WIDTH,THUMBNAIL_HEIGHT);
+        CancellationSignal cs = new CancellationSignal();
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            try {
+                bitmapThumbnail = ThumbnailUtils.createVideoThumbnail(videoFile, mSize, cs);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return bitmapThumbnail;
     }
 }

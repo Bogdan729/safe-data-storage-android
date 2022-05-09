@@ -41,7 +41,7 @@ public class ContainerActivity extends AppCompatActivity {
         adapter = new ViewPagerAdapter(this);
         adapter.addFragment(new FragmentImage(keyObj));
         adapter.addFragment(new FragmentVideo(keyObj));
-        adapter.addFragment(new FragmentDocument());
+        adapter.addFragment(new FragmentDocument(keyObj));
         adapter.addFragment(new FragmentAudio());
 
         viewPager2.setAdapter(adapter);

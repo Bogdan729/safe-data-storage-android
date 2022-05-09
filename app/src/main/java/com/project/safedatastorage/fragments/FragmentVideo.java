@@ -68,21 +68,21 @@ public class FragmentVideo extends Fragment {
         } else {
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerView.setAdapter(adapter);
-
-            addVideo = view.findViewById(R.id.add_video_btn);
-
-            ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    this::onActivityResult);
-
-            addVideo.setOnClickListener(view -> {
-                Intent intent = new Intent();
-                intent.setType("video/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-
-                activityResultLauncher.launch(intent);
-            });
         }
+
+        addVideo = view.findViewById(R.id.add_video_btn);
+
+        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::onActivityResult);
+
+        addVideo.setOnClickListener(view -> {
+            Intent intent = new Intent();
+            intent.setType("video/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+
+            activityResultLauncher.launch(intent);
+        });
 
         return view;
     }
@@ -100,7 +100,7 @@ public class FragmentVideo extends Fragment {
                 String name = videoFile.getName();
                 String duration = VideoItem.getVideoDurationFromUri(getContext(), uri);
                 String size = FileUtil.getFormattedFileSize(videoFile.length());
-                Bitmap thumbnail = VideoItem.createThumbnailFromFile(videoFile);
+                Bitmap thumbnail = FileUtil.createVideoThumbnailFromFile(videoFile);
 
                 VideoItem videoItem = new VideoItem(uri, name, duration, size, videoFile, thumbnail);
                 videoList.add(videoItem);
