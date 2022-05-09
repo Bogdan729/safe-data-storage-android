@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,7 @@ import com.project.safedatastorage.items.ImageItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
 import com.project.safedatastorage.util.ImageUtil;
-import com.project.safedatastorage.writer.ImageRW;
+import com.project.safedatastorage.writer.FileReaderWriter;
 
 
 import java.io.File;
@@ -40,11 +41,10 @@ import java.util.List;
 
 public class FragmentImage extends Fragment {
 
-    final String TAG = "FragmentImage";
+    private static final String IMAGE_DIR = Environment.getExternalStorageDirectory().getPath() + "/DataStorage/images";
 
     private List<ImageItem> listImages;
-    private Key key;
-    private ImageRW imageRW;
+    private Key keyObj;
 
     ImageViewAdapter adapter;
 
@@ -57,8 +57,8 @@ public class FragmentImage extends Fragment {
 
     }
 
-    public FragmentImage(Key key) {
-        this.key = key;
+    public FragmentImage(Key keyObj) {
+        this.keyObj = keyObj;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -103,10 +103,8 @@ public class FragmentImage extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        imageRW = new ImageRW(this.getContext(), key);
-
         listImages = new ArrayList<>();
-        List<File> decryptedImages = imageRW.readFromInternalStorage();
+        List<File> decryptedImages = FileReaderWriter.readFromInternalStorage(getContext(), keyObj, IMAGE_DIR);
 
         if (decryptedImages != null) {
             for (File imageFile : decryptedImages) {
@@ -133,7 +131,8 @@ public class FragmentImage extends Fragment {
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 File file = FileUtil.getFileFromUri(getContext(), uri);
-                imageRW.writeToInternalStorage(file);
+
+                FileReaderWriter.writeToInternalStorage(file, keyObj, IMAGE_DIR);
 
                 Bitmap bitmap = ImageUtil.getThumbnail(file);
                 String size = FileUtil.getFormattedFileSize(file.length());

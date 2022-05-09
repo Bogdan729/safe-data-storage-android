@@ -1,13 +1,11 @@
 package com.project.safedatastorage.items;
 
 import android.graphics.Bitmap;
-import android.widget.ImageView;
 
 public class ImageItem {
     private String imageName;
     private String imageSize;
     private Bitmap image;
-    private ImageView imageView;
 
     public ImageItem(String imageName, String imageSize, Bitmap image) {
         this.imageName = imageName;
