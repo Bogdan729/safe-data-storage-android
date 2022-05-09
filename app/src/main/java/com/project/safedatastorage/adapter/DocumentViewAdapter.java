@@ -35,7 +35,10 @@ public class DocumentViewAdapter extends RecyclerView.Adapter<DocumentViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull DocumentViewAdapter.ViewHolder holder, int position) {
-
+        holder.docName.setText(documentItemList.get(position).getName());
+        holder.docName.setSelected(true);
+        holder.docSize.setText(documentItemList.get(position).getSize());
+        holder.thumbnail.setImageBitmap(documentItemList.get(position).getThumbnail());
     }
 
     @Override
@@ -50,10 +53,10 @@ public class DocumentViewAdapter extends RecyclerView.Adapter<DocumentViewAdapte
 
         public ViewHolder(View itemView) {
             super(itemView);
-            container = itemView.findViewById(R.id.image_container);
-            docName = itemView.findViewById(R.id.tv_img_name);
-            docSize = itemView.findViewById(R.id.tv_img_size);
-            thumbnail = itemView.findViewById(R.id.photo_img_view);
+            container = itemView.findViewById(R.id.image_and_doc_container);
+            docName = itemView.findViewById(R.id.tv_name);
+            docSize = itemView.findViewById(R.id.tv_size);
+            thumbnail = itemView.findViewById(R.id.img_view);
         }
     }
 }

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 
 import com.project.safedatastorage.util.FileUtil;
+import com.project.safedatastorage.util.PdfUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,10 +28,30 @@ public class DocumentItem {
         this.file = file;
     }
 
+    public Uri getUri() {
+        return uri;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public Bitmap getThumbnail() {
+        return thumbnail;
+    }
+
     public static DocumentItem createDocument(Context context, Uri docUri) {
         DocumentItem docItem = null;
 
-        String[] projection = new String[] {
+        String[] projection = new String[]{
                 MediaStore.Files.FileColumns.DISPLAY_NAME,
                 MediaStore.Files.FileColumns.SIZE,
         };
@@ -52,7 +73,7 @@ public class DocumentItem {
                 String name = cursor.getString(nameColumn);
                 String size = FileUtil.getFormattedFileSize(cursor.getInt(sizeColumn));
                 File docFile = FileUtil.getFileFromUri(context, docUri);
-                Bitmap thumbnail = FileUtil.createVideoThumbnailFromFile(docFile);
+                Bitmap thumbnail = PdfUtil.generateThumbnailFromPdf(docFile.getPath());
 
                 docItem = new DocumentItem(docUri, name, size, docFile, thumbnail);
             }
@@ -61,5 +82,16 @@ public class DocumentItem {
         }
 
         return docItem;
+    }
+
+    @Override
+    public String toString() {
+        return "DocumentItem{" +
+                "uri=" + uri +
+                ", name='" + name + '\'' +
+                ", size='" + size + '\'' +
+                ", file=" + file +
+                ", thumbnail=" + thumbnail +
+                '}';
     }
 }
