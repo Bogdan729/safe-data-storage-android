@@ -77,24 +77,18 @@ public class FragmentImage extends Fragment {
         } else {
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerView.setAdapter(adapter);
-
-            addImage = view.findViewById(R.id.add_img_btn);
-
-            ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(),
-                    this::onActivityResult);
-
-            addImage.setOnClickListener(view -> {
-                // Получение доступа ко ГАЛЕРЕИ
-                Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-
-                // Получение доступа ко ХРАНИЛИЩУ
-//            Intent gallery = new Intent(Intent.ACTION_GET_CONTENT);
-//            gallery.setType("*/*");
-
-                activityResultLauncher.launch(gallery);
-            });
         }
+
+        addImage = view.findViewById(R.id.add_img_btn);
+
+        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::onActivityResult);
+
+        addImage.setOnClickListener(view -> {
+            Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+            activityResultLauncher.launch(gallery);
+        });
 
         return view;
     }
