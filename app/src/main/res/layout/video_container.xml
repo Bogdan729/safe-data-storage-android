@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardBackgroundColor="@color/black"
-    android:id="@+id/video_container">
+    android:id="@+id/video_and_audio_container">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -15,7 +15,7 @@
         android:layout_gravity="center_vertical">
 
         <ImageView
-            android:id="@+id/video_thumbnail_view"
+            android:id="@+id/video_and_audio_thumbnail_view"
             android:layout_width="49dp"
             android:layout_height="49dp"
             android:src="@drawable/ic_image"
@@ -31,7 +31,7 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/tv_video_name"
+                android:id="@+id/tv_video_and_audio_name"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:textColor="@color/white"
@@ -49,7 +49,7 @@
             </TextView>
 
             <TextView
-                android:id="@+id/tv_video_size"
+                android:id="@+id/tv_video_and_audio_size"
                 android:text="Size"
                 android:textSize="16sp"
                 android:textColor="@color/white"
@@ -61,7 +61,7 @@
             </TextView>
 
             <TextView
-                android:id="@+id/tv_video_duration"
+                android:id="@+id/tv_video_and_audio_duration"
                 android:text="Duration"
                 android:textSize="16sp"
                 android:textColor="@color/white"
