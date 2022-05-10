@@ -12,18 +12,21 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.safedatastorage.R;
+import com.project.safedatastorage.interaction.OnFileSelectedListener;
 import com.project.safedatastorage.items.VideoItem;
 
 import java.util.List;
 
 public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.ViewHolder> {
 
-    Context context;
-    List<VideoItem> videoItemsList;
+    private Context context;
+    private List<VideoItem> videoItemsList;
+    private OnFileSelectedListener listener;
 
-    public VideoViewAdapter(Context context, List<VideoItem> videoItemsList) {
+    public VideoViewAdapter(Context context, List<VideoItem> videoItemsList, OnFileSelectedListener listener) {
         this.context = context;
         this.videoItemsList = videoItemsList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -40,6 +43,15 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
         holder.videoSize.setText(videoItemsList.get(position).getSize());
         holder.duration.setText(videoItemsList.get(position).getDuration());
         holder.thumbnail.setImageBitmap(videoItemsList.get(position).getThumbnail());
+
+        holder.container.setOnClickListener(view ->
+            listener.onFileClicked(videoItemsList.get(position).getFile())
+        );
+
+        holder.container.setOnLongClickListener(view -> {
+            listener.onFileLongClicked(videoItemsList.get(position).getFile());
+            return true;
+        });
     }
 
     @Override

@@ -1,39 +1,89 @@
 package com.project.safedatastorage.items;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
+
+import com.project.safedatastorage.util.FileUtil;
+import com.project.safedatastorage.util.ImageUtil;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ImageItem {
-    private String imageName;
-    private String imageSize;
-    private Bitmap image;
 
-    public ImageItem(String imageName, String imageSize, Bitmap image) {
-        this.imageName = imageName;
-        this.imageSize = imageSize;
-        this.image = image;
+    private final Uri uri;
+    private final String name;
+    private final String size;
+    private final File file;
+    private final Bitmap thumbnail;
+
+    public ImageItem(Uri uri, String name, String size, File file, Bitmap thumbnail) {
+        this.uri = uri;
+        this.name = name;
+        this.size = size;
+        this.thumbnail = thumbnail;
+        this.file = file;
     }
 
-    public String getImageName() {
-        return imageName;
+    public Uri getUri() {
+        return uri;
     }
 
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
+    public String getName() {
+        return name;
     }
 
-    public String getImageSize() {
-        return imageSize;
+    public String getSize() {
+        return size;
     }
 
-    public void setImageSize(String imageSize) {
-        this.imageSize = imageSize;
+    public File getFile() {
+        return file;
     }
 
-    public Bitmap getImage() {
-        return image;
+    public Bitmap getThumbnail() {
+        return thumbnail;
     }
 
-    public void setImage(Bitmap image) {
-        this.image = image;
+    public static ImageItem createImage(Context context, Uri imgUri) {
+        ImageItem imgItem = null;
+
+        String[] projection = new String[]{
+                MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.SIZE,
+        };
+
+        String sortOrder = MediaStore.Images.Media.DISPLAY_NAME + " ASC";
+
+        try (Cursor cursor = context.getContentResolver().query(
+                imgUri,
+                projection,
+                null,
+                null,
+                sortOrder
+        )) {
+            int nameColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
+            int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE);
+
+            while (cursor.moveToNext()) {
+                String name = cursor.getString(nameColumn);
+                String size = FileUtil.getFormattedFileSize(cursor.getInt(sizeColumn));
+                File imgFile = FileUtil.getFileFromUri(context, imgUri);
+
+                Bitmap bitmap = ImageUtil.getThumbnail(imgFile);
+                int necessaryRotation = FileUtil.getFileExifRotation(imgFile);
+                Bitmap thumbnail = ImageUtil.rotateImage(bitmap, necessaryRotation);
+
+                imgItem = new ImageItem(imgUri, name, size, imgFile, thumbnail);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return imgItem;
     }
 }

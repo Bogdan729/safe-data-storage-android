@@ -12,18 +12,21 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.safedatastorage.R;
+import com.project.safedatastorage.interaction.OnFileSelectedListener;
 import com.project.safedatastorage.items.DocumentItem;
 
 import java.util.List;
 
 public class DocumentViewAdapter extends RecyclerView.Adapter<DocumentViewAdapter.ViewHolder> {
 
-    Context context;
-    List<DocumentItem> documentItemList;
+    private Context context;
+    private List<DocumentItem> documentItemList;
+    private OnFileSelectedListener listener;
 
-    public DocumentViewAdapter(Context context, List<DocumentItem> documentItemList) {
+    public DocumentViewAdapter(Context context, List<DocumentItem> documentItemList, OnFileSelectedListener listener) {
         this.context = context;
         this.documentItemList = documentItemList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -39,6 +42,15 @@ public class DocumentViewAdapter extends RecyclerView.Adapter<DocumentViewAdapte
         holder.docName.setSelected(true);
         holder.docSize.setText(documentItemList.get(position).getSize());
         holder.thumbnail.setImageBitmap(documentItemList.get(position).getThumbnail());
+
+        holder.container.setOnClickListener(view ->
+                listener.onFileClicked(documentItemList.get(position).getFile())
+        );
+
+        holder.container.setOnLongClickListener(view -> {
+            listener.onFileLongClicked(documentItemList.get(position).getFile());
+            return true;
+        });
     }
 
     @Override

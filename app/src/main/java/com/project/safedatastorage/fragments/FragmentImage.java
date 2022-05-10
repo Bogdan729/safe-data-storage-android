@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -27,6 +26,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.project.safedatastorage.adapter.ImageViewAdapter;
 import com.project.safedatastorage.R;
 import com.project.safedatastorage.adapter.RVEmptyObserver;
+import com.project.safedatastorage.interaction.FileOpener;
+import com.project.safedatastorage.interaction.OnFileSelectedListener;
 import com.project.safedatastorage.items.ImageItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
@@ -39,7 +40,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentImage extends Fragment {
+public class FragmentImage extends Fragment implements OnFileSelectedListener {
 
     private static final String IMAGE_DIR = Environment.getExternalStorageDirectory().getPath() + "/DataStorage/images";
 
@@ -50,8 +51,6 @@ public class FragmentImage extends Fragment {
 
     Button addImage;
     View view;
-
-    Uri imageUri;
 
     public FragmentImage() {
 
@@ -69,7 +68,7 @@ public class FragmentImage extends Fragment {
         View emptyView = new View(getContext());
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_image);
-        adapter = new ImageViewAdapter(getContext(), listImages);
+        adapter = new ImageViewAdapter(getContext(), listImages, this);
 
         if (listImages == null) {
             RVEmptyObserver observer = new RVEmptyObserver(recyclerView, emptyView);
@@ -103,15 +102,15 @@ public class FragmentImage extends Fragment {
         if (decryptedImages != null) {
             for (File imageFile : decryptedImages) {
                 try {
-                    Bitmap bitImage = ImageUtil.getThumbnail(imageFile);
+                    Uri uri = Uri.fromFile(imageFile);
                     String name = imageFile.getName();
                     String size = FileUtil.getFormattedFileSize(imageFile.length());
 
+                    Bitmap bitImage = ImageUtil.getThumbnail(imageFile);
                     int necessaryRotation = FileUtil.getFileExifRotation(imageFile);
-
                     Bitmap resultImage = ImageUtil.rotateImage(bitImage, necessaryRotation);
 
-                    ImageItem imageItem = new ImageItem(name, size, resultImage);
+                    ImageItem imageItem = new ImageItem(uri, name, size, imageFile, resultImage);
 
                     listImages.add(imageItem);
                 } catch (IOException e) {
@@ -121,37 +120,52 @@ public class FragmentImage extends Fragment {
         }
     }
 
-    public void saveFile(Uri uri) {
+//    public void saveFile(Uri uri) {
+//        try {
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//                File file = FileUtil.getFileFromUri(getContext(), uri);
+//
+//                FileReaderWriter.writeToInternalStorage(file, keyObj, IMAGE_DIR);
+//
+//                Bitmap bitmap = ImageUtil.getThumbnail(file);
+//                String size = FileUtil.getFormattedFileSize(file.length());
+//                String fileName = file.getName();
+//
+//                int necessaryRotation = FileUtil.getFileExifRotation(file);
+//
+//                Bitmap result = ImageUtil.rotateImage(bitmap, necessaryRotation);
+//                ImageItem item = new ImageItem(fileName, size, result);
+//
+//                listImages.add(item);
+//                adapter.notifyItemChanged(listImages.size());
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void onActivityResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            Uri uri = result.getData().getData();
+            ImageItem item1 = ImageItem.createImage(getContext(), uri);
+            FileReaderWriter.writeToInternalStorage(item1.getFile(), keyObj, IMAGE_DIR);
+            listImages.add(item1);
+            adapter.notifyItemChanged(listImages.size());
+        }
+    }
+
+    @Override
+    public void onFileClicked(File file) {
         try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                File file = FileUtil.getFileFromUri(getContext(), uri);
-
-                FileReaderWriter.writeToInternalStorage(file, keyObj, IMAGE_DIR);
-
-                Bitmap bitmap = ImageUtil.getThumbnail(file);
-                String size = FileUtil.getFormattedFileSize(file.length());
-                String fileName = file.getName();
-
-                int necessaryRotation = FileUtil.getFileExifRotation(file);
-
-                Bitmap result = ImageUtil.rotateImage(bitmap, necessaryRotation);
-                ImageItem item = new ImageItem(fileName, size, result);
-
-                listImages.add(item);
-                adapter.notifyItemChanged(listImages.size());
-            }
+            FileOpener.openFile(getContext(), file);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void onActivityResult(ActivityResult result) {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            imageUri = result.getData().getData();
-            saveFile(imageUri);
+    @Override
+    public void onFileLongClicked(File file) {
 
-            Toast.makeText(getContext(), "file saved", Toast.LENGTH_LONG).show();
-        }
     }
 }

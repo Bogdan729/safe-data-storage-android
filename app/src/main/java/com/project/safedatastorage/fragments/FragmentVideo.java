@@ -17,22 +17,27 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.safedatastorage.R;
 import com.project.safedatastorage.adapter.RVEmptyObserver;
 import com.project.safedatastorage.adapter.VideoViewAdapter;
+import com.project.safedatastorage.interaction.FileOpener;
+import com.project.safedatastorage.interaction.OnFileSelectedListener;
 import com.project.safedatastorage.items.VideoItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
 import com.project.safedatastorage.writer.FileReaderWriter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentVideo extends Fragment {
+public class FragmentVideo extends Fragment implements OnFileSelectedListener {
 
     private static final String VIDEO_DIR = Environment.getExternalStorageDirectory().getPath() + "/DataStorage/video";
 
@@ -60,7 +65,7 @@ public class FragmentVideo extends Fragment {
         View emptyView = new View(getContext());
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_video);
-        adapter = new VideoViewAdapter(getContext(), videoList);
+        adapter = new VideoViewAdapter(getContext(), videoList, this);
 
         if (videoList == null) {
             RVEmptyObserver observer = new RVEmptyObserver(recyclerView, emptyView);
@@ -116,5 +121,19 @@ public class FragmentVideo extends Fragment {
             videoList.add(videoItem);
             adapter.notifyItemChanged(videoList.size());
         }
+    }
+
+    @Override
+    public void onFileClicked(File file) {
+        try {
+            FileOpener.openFile(getContext(), file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onFileLongClicked(File file) {
+
     }
 }

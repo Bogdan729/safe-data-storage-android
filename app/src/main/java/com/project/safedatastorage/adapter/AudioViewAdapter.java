@@ -13,18 +13,21 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.safedatastorage.R;
+import com.project.safedatastorage.interaction.OnFileSelectedListener;
 import com.project.safedatastorage.items.AudioItem;
 
 import java.util.List;
 
 public class AudioViewAdapter extends RecyclerView.Adapter<AudioViewAdapter.ViewHolder> {
 
-    Context context;
-    List<AudioItem> videoItemsList;
+    private Context context;
+    private List<AudioItem> videoItemsList;
+    private OnFileSelectedListener listener;
 
-    public AudioViewAdapter(Context context, List<AudioItem> audioItemsList) {
+    public AudioViewAdapter(Context context, List<AudioItem> audioItemsList, OnFileSelectedListener listener) {
         this.context = context;
         this.videoItemsList = audioItemsList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -42,6 +45,15 @@ public class AudioViewAdapter extends RecyclerView.Adapter<AudioViewAdapter.View
         holder.audioSize.setText(videoItemsList.get(position).getSize());
         holder.duration.setText(videoItemsList.get(position).getDuration());
         holder.thumbnail.setImageDrawable(context.getDrawable(R.drawable.ic_audio));
+
+        holder.container.setOnClickListener(view ->
+                listener.onFileClicked(videoItemsList.get(position).getFile())
+        );
+
+        holder.container.setOnLongClickListener(view -> {
+            listener.onFileLongClicked(videoItemsList.get(position).getFile());
+            return true;
+        });
     }
 
     @Override
