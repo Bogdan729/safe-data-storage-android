@@ -56,11 +56,11 @@ public class AudioViewAdapter extends RecyclerView.Adapter<AudioViewAdapter.View
 
         public ViewHolder(View itemView) {
             super(itemView);
-            container = itemView.findViewById(R.id.video_container);
-            audioName = itemView.findViewById(R.id.tv_video_name);
-            audioSize = itemView.findViewById(R.id.tv_video_size);
-            duration = itemView.findViewById(R.id.tv_video_duration);
-            thumbnail = itemView.findViewById(R.id.video_thumbnail_view);
+            container = itemView.findViewById(R.id.video_and_audio_container);
+            audioName = itemView.findViewById(R.id.tv_video_and_audio_name);
+            audioSize = itemView.findViewById(R.id.tv_video_and_audio_size);
+            duration = itemView.findViewById(R.id.tv_video_and_audio_duration);
+            thumbnail = itemView.findViewById(R.id.video_and_audio_thumbnail_view);
         }
     }
 }
