@@ -1,5 +1,6 @@
 package com.project.safedatastorage.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,34 +13,35 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.safedatastorage.R;
-import com.project.safedatastorage.items.VideoItem;
+import com.project.safedatastorage.items.AudioItem;
 
 import java.util.List;
 
-public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.ViewHolder> {
+public class AudioViewAdapter extends RecyclerView.Adapter<AudioViewAdapter.ViewHolder> {
 
     Context context;
-    List<VideoItem> videoItemsList;
+    List<AudioItem> videoItemsList;
 
-    public VideoViewAdapter(Context context, List<VideoItem> videoItemsList) {
+    public AudioViewAdapter(Context context, List<AudioItem> audioItemsList) {
         this.context = context;
-        this.videoItemsList = videoItemsList;
+        this.videoItemsList = audioItemsList;
     }
 
     @NonNull
     @Override
-    public VideoViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public AudioViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.video_container, parent, false);
-        return new ViewHolder(view);
+        return new AudioViewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull VideoViewAdapter.ViewHolder holder, int position) {
-        holder.videoName.setText(videoItemsList.get(position).getName());
-        holder.videoName.setSelected(true);
-        holder.videoSize.setText(videoItemsList.get(position).getSize());
+    @SuppressLint("UseCompatLoadingForDrawables")
+    public void onBindViewHolder(@NonNull AudioViewAdapter.ViewHolder holder, int position) {
+        holder.audioName.setText(videoItemsList.get(position).getName());
+        holder.audioName.setSelected(true);
+        holder.audioSize.setText(videoItemsList.get(position).getSize());
         holder.duration.setText(videoItemsList.get(position).getDuration());
-        holder.thumbnail.setImageBitmap(videoItemsList.get(position).getThumbnail());
+        holder.thumbnail.setImageDrawable(context.getDrawable(R.drawable.ic_audio));
     }
 
     @Override
@@ -48,15 +50,15 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView videoName, videoSize, duration;
+        private TextView audioName, audioSize, duration;
         private CardView container;
         private ImageView thumbnail;
 
         public ViewHolder(View itemView) {
             super(itemView);
             container = itemView.findViewById(R.id.video_container);
-            videoName = itemView.findViewById(R.id.tv_video_name);
-            videoSize = itemView.findViewById(R.id.tv_video_size);
+            audioName = itemView.findViewById(R.id.tv_video_name);
+            audioSize = itemView.findViewById(R.id.tv_video_size);
             duration = itemView.findViewById(R.id.tv_video_duration);
             thumbnail = itemView.findViewById(R.id.video_thumbnail_view);
         }

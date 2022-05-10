@@ -22,7 +22,6 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         return listFragments.get(position);
     }
 
-
     @Override
     public int getItemCount() {
         return listFragments.size();

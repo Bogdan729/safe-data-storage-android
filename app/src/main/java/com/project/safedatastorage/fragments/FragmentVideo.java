@@ -98,7 +98,7 @@ public class FragmentVideo extends Fragment {
             for (File videoFile : decryptedVideo) {
                 Uri uri = Uri.fromFile(videoFile);
                 String name = videoFile.getName();
-                String duration = VideoItem.getVideoDurationFromUri(getContext(), uri);
+                String duration = FileUtil.getDurationFromUri(getContext(), uri);
                 String size = FileUtil.getFormattedFileSize(videoFile.length());
                 Bitmap thumbnail = FileUtil.createVideoThumbnailFromFile(videoFile);
 
