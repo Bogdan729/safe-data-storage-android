@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.project.safedatastorage.R;
 import com.project.safedatastorage.adapter.DocumentViewAdapter;
 import com.project.safedatastorage.adapter.RVEmptyObserver;
+import com.project.safedatastorage.interaction.FileOpener;
+import com.project.safedatastorage.interaction.OnFileSelectedListener;
 import com.project.safedatastorage.items.DocumentItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
@@ -31,10 +32,11 @@ import com.project.safedatastorage.util.PdfUtil;
 import com.project.safedatastorage.writer.FileReaderWriter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentDocument extends Fragment {
+public class FragmentDocument extends Fragment implements OnFileSelectedListener {
 
     private static final String FILE_DIR = Environment.getExternalStorageDirectory().getPath() + "/DataStorage/documents";
 
@@ -62,7 +64,7 @@ public class FragmentDocument extends Fragment {
         View emptyView = new View(getContext());
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_document);
-        adapter = new DocumentViewAdapter(getContext(), documentsList);
+        adapter = new DocumentViewAdapter(getContext(), documentsList, this);
 
         if (documentsList == null) {
             RVEmptyObserver observer = new RVEmptyObserver(recyclerView, emptyView);
@@ -117,5 +119,19 @@ public class FragmentDocument extends Fragment {
             documentsList.add(documentItem);
             adapter.notifyItemChanged(documentsList.size());
         }
+    }
+
+    @Override
+    public void onFileClicked(File file) {
+        try {
+            FileOpener.openFile(getContext(), file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onFileLongClicked(File file) {
+
     }
 }

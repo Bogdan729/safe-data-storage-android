@@ -12,18 +12,21 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.project.safedatastorage.R;
+import com.project.safedatastorage.interaction.OnFileSelectedListener;
 import com.project.safedatastorage.items.ImageItem;
 
 import java.util.List;
 
 public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.ViewHolder> {
 
-    Context context;
-    List<ImageItem> imageItemList;
+    private Context context;
+    private List<ImageItem> imageItemsList;
+    private OnFileSelectedListener listener;
 
-    public ImageViewAdapter(Context context, List<ImageItem> imageItemList) {
+    public ImageViewAdapter(Context context, List<ImageItem> imageItemsList, OnFileSelectedListener listener) {
         this.context = context;
-        this.imageItemList = imageItemList;
+        this.imageItemsList = imageItemsList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -35,15 +38,24 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.imgName.setText(imageItemList.get(position).getImageName());
+        holder.imgName.setText(imageItemsList.get(position).getName());
         holder.imgName.setSelected(true);
-        holder.imgSize.setText(imageItemList.get(position).getImageSize());
-        holder.imgView.setImageBitmap(imageItemList.get(position).getImage());
+        holder.imgSize.setText(imageItemsList.get(position).getSize());
+        holder.imgView.setImageBitmap(imageItemsList.get(position).getThumbnail());
+
+        holder.container.setOnClickListener(view ->
+                listener.onFileClicked(imageItemsList.get(position).getFile())
+        );
+
+        holder.container.setOnLongClickListener(view -> {
+            listener.onFileLongClicked(imageItemsList.get(position).getFile());
+            return true;
+        });
     }
 
     @Override
     public int getItemCount() {
-        return imageItemList.size();
+        return imageItemsList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
