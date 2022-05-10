@@ -11,6 +11,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.ExifInterface;
+import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.CancellationSignal;
@@ -24,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
 
 public class FileUtil {
     private static final int EOF = -1;
@@ -171,5 +173,20 @@ public class FileUtil {
         }
 
         return bitmapThumbnail;
+    }
+
+    public static String getDurationFromUri(Context context, Uri videoUri) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(context, videoUri);
+        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        long timeInMills = Long.parseLong(time);
+        retriever.release();
+
+        @SuppressLint("DefaultLocale") String res = String.format("%d min, %d sec",
+                TimeUnit.MILLISECONDS.toMinutes(timeInMills),
+                TimeUnit.MILLISECONDS.toSeconds(timeInMills) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMills)));
+
+        return res;
     }
 }

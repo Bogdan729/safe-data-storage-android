@@ -2,29 +2,27 @@ package com.project.safedatastorage.items;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 
 import com.project.safedatastorage.util.FileUtil;
-import com.project.safedatastorage.util.PdfUtil;
 
 import java.io.File;
 import java.io.IOException;
 
-public class DocumentItem {
+public class AudioItem {
 
     private final Uri uri;
     private final String name;
+    private final String duration;
     private final String size;
     private final File file;
-    private final Bitmap thumbnail;
 
-    public DocumentItem(Uri uri, String name, String size, File file, Bitmap thumbnail) {
+    public AudioItem(Uri uri, String name, String duration, String size, File file) {
         this.uri = uri;
         this.name = name;
+        this.duration = duration;
         this.size = size;
-        this.thumbnail = thumbnail;
         this.file = file;
     }
 
@@ -36,6 +34,10 @@ public class DocumentItem {
         return name;
     }
 
+    public String getDuration() {
+        return duration;
+    }
+
     public String getSize() {
         return size;
     }
@@ -44,43 +46,38 @@ public class DocumentItem {
         return file;
     }
 
-    public Bitmap getThumbnail() {
-        return thumbnail;
-    }
+    public static AudioItem createAudio(Context context, Uri audioUri) {
+        AudioItem audioItem = null;
 
-    public static DocumentItem createDocument(Context context, Uri docUri) {
-        DocumentItem docItem = null;
-
-        String[] projection = new String[]{
-                MediaStore.Files.FileColumns.DISPLAY_NAME,
-                MediaStore.Files.FileColumns.SIZE,
+        String[] projection = new String[] {
+                MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media.SIZE,
         };
 
-        String sortOrder = MediaStore.Files.FileColumns.DISPLAY_NAME + " ASC";
+        String sortOrder = MediaStore.Audio.Media.DISPLAY_NAME + " ASC";
 
         try (Cursor cursor = context.getContentResolver().query(
-                docUri,
+                audioUri,
                 projection,
                 null,
                 null,
                 sortOrder
         )) {
-            int nameColumn =
-                    cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME);
-            int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE);
+            int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
+            int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE);
 
             while (cursor.moveToNext()) {
                 String name = cursor.getString(nameColumn);
                 String size = FileUtil.getFormattedFileSize(cursor.getInt(sizeColumn));
-                File docFile = FileUtil.getFileFromUri(context, docUri);
-                Bitmap thumbnail = PdfUtil.generateThumbnailFromPdf(docFile.getPath());
+                String duration = FileUtil.getDurationFromUri(context, audioUri);
+                File audioFile = FileUtil.getFileFromUri(context, audioUri);
 
-                docItem = new DocumentItem(docUri, name, size, docFile, thumbnail);
+                audioItem = new AudioItem(audioUri, name, duration, size, audioFile);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return docItem;
+        return audioItem;
     }
 }

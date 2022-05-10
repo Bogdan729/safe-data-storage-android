@@ -154,7 +154,4 @@ public class FragmentImage extends Fragment {
             Toast.makeText(getContext(), "file saved", Toast.LENGTH_LONG).show();
         }
     }
-
-    // ТЕСТРОВЫЕ МЕТОДЫ
-
 }

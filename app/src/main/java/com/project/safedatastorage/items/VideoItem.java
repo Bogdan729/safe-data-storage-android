@@ -1,21 +1,15 @@
 package com.project.safedatastorage.items;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.os.CancellationSignal;
 import android.provider.MediaStore;
-import android.util.Size;
 
 import com.project.safedatastorage.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class VideoItem {
 
@@ -83,7 +77,7 @@ public class VideoItem {
             while (cursor.moveToNext()) {
                 String name = cursor.getString(nameColumn);
                 String size = FileUtil.getFormattedFileSize(cursor.getInt(sizeColumn));
-                String duration = getVideoDurationFromUri(context, videoUri);
+                String duration = FileUtil.getDurationFromUri(context, videoUri);
                 File videoFile = FileUtil.getFileFromUri(context, videoUri);
                 Bitmap thumbnail = FileUtil.createVideoThumbnailFromFile(videoFile);
 
@@ -94,20 +88,5 @@ public class VideoItem {
         }
 
         return videoItem;
-    }
-
-    public static String getVideoDurationFromUri(Context context, Uri videoUri) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(context, videoUri);
-        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        long timeInMills = Long.parseLong(time);
-        retriever.release();
-
-        @SuppressLint("DefaultLocale") String res = String.format("%d min, %d sec",
-                TimeUnit.MILLISECONDS.toMinutes(timeInMills),
-                TimeUnit.MILLISECONDS.toSeconds(timeInMills) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMills)));
-
-        return res;
     }
 }
