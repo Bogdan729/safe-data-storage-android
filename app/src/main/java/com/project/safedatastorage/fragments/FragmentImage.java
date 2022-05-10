@@ -120,37 +120,13 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
         }
     }
 
-//    public void saveFile(Uri uri) {
-//        try {
-//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//                File file = FileUtil.getFileFromUri(getContext(), uri);
-//
-//                FileReaderWriter.writeToInternalStorage(file, keyObj, IMAGE_DIR);
-//
-//                Bitmap bitmap = ImageUtil.getThumbnail(file);
-//                String size = FileUtil.getFormattedFileSize(file.length());
-//                String fileName = file.getName();
-//
-//                int necessaryRotation = FileUtil.getFileExifRotation(file);
-//
-//                Bitmap result = ImageUtil.rotateImage(bitmap, necessaryRotation);
-//                ImageItem item = new ImageItem(fileName, size, result);
-//
-//                listImages.add(item);
-//                adapter.notifyItemChanged(listImages.size());
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void onActivityResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Uri uri = result.getData().getData();
-            ImageItem item1 = ImageItem.createImage(getContext(), uri);
-            FileReaderWriter.writeToInternalStorage(item1.getFile(), keyObj, IMAGE_DIR);
-            listImages.add(item1);
+            ImageItem imgItem = ImageItem.createImage(getContext(), uri);
+            FileReaderWriter.writeToInternalStorage(imgItem.getFile(), keyObj, IMAGE_DIR);
+            listImages.add(imgItem);
             adapter.notifyItemChanged(listImages.size());
         }
     }

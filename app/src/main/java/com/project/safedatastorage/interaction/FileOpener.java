@@ -2,6 +2,7 @@ package com.project.safedatastorage.interaction;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 
 import androidx.core.content.FileProvider;
@@ -19,7 +20,8 @@ public class FileOpener {
         if (uri.toString().contains(".pdf")) {
             intent.setDataAndType(uri, "application/pdf");
         } else if (uri.toString().contains(".mp3") || uri.toString().contains(".wav")) {
-            intent.setDataAndType(uri, "audio/mpeg");
+            intent.setDataAndType(uri, "audio/*");
+            // MediaPlayer.create(context, uri).start();
         } else if (uri.toString().toLowerCase().contains(".jpeg")
                 || uri.toString().toLowerCase().contains(".jpg")
                 || uri.toString().toLowerCase().contains(".png")) {

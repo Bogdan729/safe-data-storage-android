@@ -182,7 +182,7 @@ public class FileUtil {
         long timeInMills = Long.parseLong(time);
         retriever.release();
 
-        @SuppressLint("DefaultLocale") String res = String.format("%d min, %d sec",
+        @SuppressLint("DefaultLocale") String res = String.format("%d min %d sec",
                 TimeUnit.MILLISECONDS.toMinutes(timeInMills),
                 TimeUnit.MILLISECONDS.toSeconds(timeInMills) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMills)));
