@@ -1,6 +1,7 @@
 package com.project.safedatastorage.fragments;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -11,7 +12,11 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -46,6 +51,7 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
 
     private List<ImageItem> listImages;
     private Key keyObj;
+    String[] options = {"Rename", "Share", "Delete"};
 
     ImageViewAdapter adapter;
 
@@ -142,6 +148,49 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
 
     @Override
     public void onFileLongClicked(File file) {
+        final Dialog optionDialog = new Dialog(getContext());
+        optionDialog.setContentView(R.layout.option_dialog);
+        optionDialog.setTitle("Select Options.");
+        ListView options = optionDialog.findViewById(R.id.list_view);
+        CustomAdapter customAdapter = new CustomAdapter();
+        options.setAdapter(customAdapter);
+        optionDialog.show();
+    }
 
+    class CustomAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return options.length;
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return options[i];
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            View myView =  getLayoutInflater().inflate(R.layout.option_layout, null);
+            TextView textOptions = myView.findViewById(R.id.tv_option);
+            ImageView imgOptions = myView.findViewById(R.id.iv_option);
+
+            textOptions.setText(options[i]);
+
+            if (options[i].equals("Rename")) {
+                imgOptions.setImageResource(R.drawable.ic_rename);
+            } else if (options[i].equals("Share")) {
+                imgOptions.setImageResource(R.drawable.ic_share);
+            } else if (options[i].equals("Delete")) {
+                imgOptions.setImageResource(R.drawable.ic_delete);
+            }
+
+            return myView;
+        }
     }
 }
