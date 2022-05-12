@@ -133,7 +133,7 @@ public class FragmentVideo extends Fragment implements OnFileSelectedListener {
     }
 
     @Override
-    public void onFileLongClicked(File file) {
+    public void onFileLongClicked(File file, int position) {
 
     }
 }

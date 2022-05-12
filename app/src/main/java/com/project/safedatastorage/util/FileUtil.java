@@ -68,7 +68,7 @@ public class FileUtil {
             extension = fileName.substring(i);
         }
 
-        return new String[]{name, extension};
+        return new String[] {name, extension};
     }
 
     @SuppressLint("Range")

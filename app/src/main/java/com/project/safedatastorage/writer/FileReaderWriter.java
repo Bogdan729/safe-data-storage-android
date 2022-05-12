@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -89,9 +90,7 @@ public class FileReaderWriter {
                         .collect(Collectors.toList());
 
                 for (File file : filesInFolder) {
-
-                    String[] splitName = FileUtil.splitFileName(file.getName());
-                    File tempFile = File.createTempFile(splitName[0], splitName[1], context.getCacheDir());
+                    File tempFile  = new File(context.getCacheDir(), file.getName());
                     tempFile.deleteOnExit();
 
                     fos = new FileOutputStream(tempFile);

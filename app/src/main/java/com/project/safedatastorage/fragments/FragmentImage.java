@@ -1,22 +1,33 @@
 package com.project.safedatastorage.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,6 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,11 +53,16 @@ import com.project.safedatastorage.writer.FileReaderWriter;
 
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentImage extends Fragment implements OnFileSelectedListener {
+
+    public static final String TAG = "FragmentImage";
 
     private static final String IMAGE_DIR = Environment.getExternalStorageDirectory().getPath() + "/DataStorage/images";
 
@@ -131,7 +148,6 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Uri uri = result.getData().getData();
             ImageItem imgItem = ImageItem.createImage(getContext(), uri);
-            FileReaderWriter.writeToInternalStorage(imgItem.getFile(), keyObj, IMAGE_DIR);
             listImages.add(imgItem);
             adapter.notifyItemChanged(listImages.size());
         }
@@ -147,7 +163,7 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
     }
 
     @Override
-    public void onFileLongClicked(File file) {
+    public void onFileLongClicked(File file, int position) {
         final Dialog optionDialog = new Dialog(getContext());
         optionDialog.setContentView(R.layout.option_dialog);
         optionDialog.setTitle("Select Options.");
@@ -155,6 +171,89 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
         CustomAdapter customAdapter = new CustomAdapter();
         options.setAdapter(customAdapter);
         optionDialog.show();
+
+        options.setOnItemClickListener((adapterView, view, i, l) -> {
+            String selectedItem = adapterView.getItemAtPosition(i).toString();
+
+            switch (selectedItem) {
+                case "Rename":
+                    AlertDialog.Builder renameDialog = new AlertDialog.Builder(getContext());
+                    renameDialog.setTitle("Rename File :");
+                    final EditText name = new EditText(getContext());
+                    renameDialog.setView(name);
+
+                    renameDialog.setPositiveButton("OK", (dialogInterface, i1) -> {
+                        ImageItem currentItem = listImages.get(position);
+
+                        String extension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf("."));
+                        String newName = name.getEditableText().toString() + extension;
+
+                        File currentTemp = new File(file.getAbsolutePath());
+                        File destinationTemp = new File(file.getAbsolutePath().replace(currentItem.getName(), newName));
+
+                        if (currentTemp.renameTo(destinationTemp)) {
+                            renameFile(file.getName(), newName);
+                            currentItem.setName(newName);
+                            listImages.set(position, currentItem);
+                            adapter.notifyItemChanged(position);
+                            Toast.makeText(getContext(), "Renamed", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Couldn't Renamed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    renameDialog.setNegativeButton("Cancel", (dialogInterface, i12) -> {
+                        optionDialog.cancel();
+                    });
+
+                    AlertDialog alertDialogRename = renameDialog.create();
+                    alertDialogRename.show();
+
+                    break;
+                case "Share":
+                    String fileName = file.getName();
+
+                    Intent share = new Intent();
+                    share.setAction(Intent.ACTION_SEND);
+                    share.setType(URLConnection.guessContentTypeFromName(file.getName()));
+
+                    Uri uri = FileProvider.getUriForFile(getContext(),
+                            getContext().getApplicationContext().getPackageName() + ".provider", file);
+
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
+
+                    List<ResolveInfo> resInfoList = getContext().getPackageManager().queryIntentActivities(share, PackageManager.MATCH_DEFAULT_ONLY);
+                    for (ResolveInfo resolveInfo : resInfoList) {
+                        String packageName = resolveInfo.activityInfo.packageName;
+                        getContext().grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    }
+
+
+                    startActivity(Intent.createChooser(share, "Share " + fileName));
+                    break;
+
+                case "Delete":
+                    AlertDialog.Builder deleteDialog = new AlertDialog.Builder(getContext());
+                    deleteDialog.setTitle("Delete " + file.getName() + "?");
+                    deleteDialog.setPositiveButton("Yes", (dialogInterface, i1) -> {
+                        deleteFileInInternalStorage(file.getName());
+                        file.delete();
+                        listImages.remove(position);
+                        adapter.notifyDataSetChanged();
+                        Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                    });
+
+                    deleteDialog.setNegativeButton("No", (dialogInterface, i2) -> {
+                        optionDialog.cancel();
+                        Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                    });
+
+                    AlertDialog alertDialog = deleteDialog.create();
+                    alertDialog.show();
+
+                    break;
+            }
+        });
     }
 
     class CustomAdapter extends BaseAdapter {
@@ -176,7 +275,7 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            View myView =  getLayoutInflater().inflate(R.layout.option_layout, null);
+            View myView = getLayoutInflater().inflate(R.layout.option_layout, null);
             TextView textOptions = myView.findViewById(R.id.tv_option);
             ImageView imgOptions = myView.findViewById(R.id.iv_option);
 
@@ -191,6 +290,41 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
             }
 
             return myView;
+        }
+    }
+
+    public void deleteFileInInternalStorage(String name) {
+        File file = new File(IMAGE_DIR + "/" + name);
+        Boolean success = file.delete();
+        Log.d(TAG, "File deleted: " + success);
+    }
+
+    public void renameFile(String originalName, String newName) {
+        try {
+            File dir = new File(IMAGE_DIR);
+            File completeImagePath = new File(IMAGE_DIR + "/" + originalName);
+
+            File from = new File(completeImagePath.getAbsolutePath());
+            File to = new File(dir, newName);
+
+            FileOutputStream out = new FileOutputStream(to);
+            FileInputStream fis = new FileInputStream(from);
+
+            int count;
+            byte[] data = new byte[1024];
+
+            while ((count = fis.read(data, 0, 1024)) != -1) {
+                out.write(data, 0, count);
+            }
+
+            out.flush();
+            out.close();
+
+            Boolean success = from.renameTo(to);
+
+            Log.d(TAG, "File renamed: " + success);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
