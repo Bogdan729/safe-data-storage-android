@@ -20,6 +20,7 @@ import android.util.Log;
 import android.util.Size;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -188,5 +189,36 @@ public class FileUtil {
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMills)));
 
         return res;
+    }
+
+    public static void deleteFileInInternalStorage(String name, String directory) {
+        File file = new File(directory + "/" + name);
+        file.delete();
+    }
+
+    public static void renameFileInInternalStorage(String originalName, String newName, String directory) {
+        try {
+            File dir = new File(directory);
+            File completeImagePath = new File(directory + "/" + originalName);
+
+            File from = new File(completeImagePath.getAbsolutePath());
+            File to = new File(dir, newName);
+
+            FileOutputStream out = new FileOutputStream(to);
+            FileInputStream fis = new FileInputStream(from);
+
+            int count;
+            byte[] data = new byte[1024];
+
+            while ((count = fis.read(data, 0, 1024)) != -1) {
+                out.write(data, 0, count);
+            }
+
+            out.flush();
+            out.close();
+            from.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

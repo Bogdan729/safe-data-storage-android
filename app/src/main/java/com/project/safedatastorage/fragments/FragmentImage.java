@@ -3,10 +3,6 @@ package com.project.safedatastorage.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -16,17 +12,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -40,6 +31,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.project.safedatastorage.adapter.CustomAdapter;
 import com.project.safedatastorage.adapter.ImageViewAdapter;
 import com.project.safedatastorage.R;
 import com.project.safedatastorage.adapter.RVEmptyObserver;
@@ -51,10 +43,7 @@ import com.project.safedatastorage.util.FileUtil;
 import com.project.safedatastorage.util.ImageUtil;
 import com.project.safedatastorage.writer.FileReaderWriter;
 
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -71,6 +60,7 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
     String[] options = {"Rename", "Share", "Delete"};
 
     ImageViewAdapter adapter;
+    CustomAdapter customAdapter;
 
     Button addImage;
     View view;
@@ -89,6 +79,8 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.image_fragment, container, false);
         View emptyView = new View(getContext());
+
+        customAdapter = new CustomAdapter(options, this);
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_image);
         adapter = new ImageViewAdapter(getContext(), listImages, this);
@@ -167,12 +159,11 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
         final Dialog optionDialog = new Dialog(getContext());
         optionDialog.setContentView(R.layout.option_dialog);
         optionDialog.setTitle("Select Options.");
-        ListView options = optionDialog.findViewById(R.id.list_view);
-        CustomAdapter customAdapter = new CustomAdapter();
-        options.setAdapter(customAdapter);
+        ListView listViewOptions = optionDialog.findViewById(R.id.list_view);
+        listViewOptions.setAdapter(customAdapter);
         optionDialog.show();
 
-        options.setOnItemClickListener((adapterView, view, i, l) -> {
+        listViewOptions.setOnItemClickListener((adapterView, view, i, l) -> {
             String selectedItem = adapterView.getItemAtPosition(i).toString();
 
             switch (selectedItem) {
@@ -192,7 +183,8 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
                         File destinationTemp = new File(file.getAbsolutePath().replace(currentItem.getName(), newName));
 
                         if (currentTemp.renameTo(destinationTemp)) {
-                            renameFile(file.getName(), newName);
+                            FileUtil.renameFileInInternalStorage(file.getName(), newName, IMAGE_DIR);
+
                             currentItem.setName(newName);
                             listImages.set(position, currentItem);
                             adapter.notifyItemChanged(position);
@@ -210,9 +202,8 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
                     alertDialogRename.show();
 
                     break;
-                case "Share":
-                    String fileName = file.getName();
 
+                case "Share":
                     Intent share = new Intent();
                     share.setAction(Intent.ACTION_SEND);
                     share.setType(URLConnection.guessContentTypeFromName(file.getName()));
@@ -228,15 +219,15 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
                         getContext().grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     }
 
-
-                    startActivity(Intent.createChooser(share, "Share " + fileName));
+                    startActivity(Intent.createChooser(share, "Share"));
                     break;
 
                 case "Delete":
                     AlertDialog.Builder deleteDialog = new AlertDialog.Builder(getContext());
                     deleteDialog.setTitle("Delete " + file.getName() + "?");
                     deleteDialog.setPositiveButton("Yes", (dialogInterface, i1) -> {
-                        deleteFileInInternalStorage(file.getName());
+                        FileUtil.deleteFileInInternalStorage(file.getName(), IMAGE_DIR);
+
                         file.delete();
                         listImages.remove(position);
                         adapter.notifyDataSetChanged();
@@ -251,80 +242,9 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
                     AlertDialog alertDialog = deleteDialog.create();
                     alertDialog.show();
 
+                    getLayoutInflater();
                     break;
             }
         });
-    }
-
-    class CustomAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return options.length;
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return options[i];
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            View myView = getLayoutInflater().inflate(R.layout.option_layout, null);
-            TextView textOptions = myView.findViewById(R.id.tv_option);
-            ImageView imgOptions = myView.findViewById(R.id.iv_option);
-
-            textOptions.setText(options[i]);
-
-            if (options[i].equals("Rename")) {
-                imgOptions.setImageResource(R.drawable.ic_rename);
-            } else if (options[i].equals("Share")) {
-                imgOptions.setImageResource(R.drawable.ic_share);
-            } else if (options[i].equals("Delete")) {
-                imgOptions.setImageResource(R.drawable.ic_delete);
-            }
-
-            return myView;
-        }
-    }
-
-    public void deleteFileInInternalStorage(String name) {
-        File file = new File(IMAGE_DIR + "/" + name);
-        Boolean success = file.delete();
-        Log.d(TAG, "File deleted: " + success);
-    }
-
-    public void renameFile(String originalName, String newName) {
-        try {
-            File dir = new File(IMAGE_DIR);
-            File completeImagePath = new File(IMAGE_DIR + "/" + originalName);
-
-            File from = new File(completeImagePath.getAbsolutePath());
-            File to = new File(dir, newName);
-
-            FileOutputStream out = new FileOutputStream(to);
-            FileInputStream fis = new FileInputStream(from);
-
-            int count;
-            byte[] data = new byte[1024];
-
-            while ((count = fis.read(data, 0, 1024)) != -1) {
-                out.write(data, 0, count);
-            }
-
-            out.flush();
-            out.close();
-
-            Boolean success = from.renameTo(to);
-
-            Log.d(TAG, "File renamed: " + success);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
