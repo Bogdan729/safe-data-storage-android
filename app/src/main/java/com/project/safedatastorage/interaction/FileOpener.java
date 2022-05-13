@@ -21,7 +21,6 @@ public class FileOpener {
             intent.setDataAndType(uri, "application/pdf");
         } else if (uri.toString().contains(".mp3") || uri.toString().contains(".wav")) {
             intent.setDataAndType(uri, "audio/*");
-            // MediaPlayer.create(context, uri).start();
         } else if (uri.toString().toLowerCase().contains(".jpeg")
                 || uri.toString().toLowerCase().contains(".jpg")
                 || uri.toString().toLowerCase().contains(".png")) {

@@ -13,7 +13,7 @@ import java.io.IOException;
 public class AudioItem {
 
     private final Uri uri;
-    private final String name;
+    private String name;
     private final String duration;
     private final String size;
     private final File file;
@@ -44,6 +44,10 @@ public class AudioItem {
 
     public File getFile() {
         return file;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public static AudioItem createAudio(Context context, Uri audioUri) {

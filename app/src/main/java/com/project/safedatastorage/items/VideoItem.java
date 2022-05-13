@@ -14,7 +14,7 @@ import java.io.IOException;
 public class VideoItem {
 
     private final Uri uri;
-    private final String name;
+    private String name;
     private final String duration;
     private final String size;
     private final File file;
@@ -51,6 +51,10 @@ public class VideoItem {
 
     public Bitmap getThumbnail() {
         return thumbnail;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public static VideoItem createVideo(Context context, Uri videoUri) {
