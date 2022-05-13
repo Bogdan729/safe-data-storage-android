@@ -48,7 +48,7 @@ public class DocumentViewAdapter extends RecyclerView.Adapter<DocumentViewAdapte
         );
 
         holder.container.setOnLongClickListener(view -> {
-            listener.onFileLongClicked(documentItemList.get(position).getFile());
+            listener.onFileLongClicked(documentItemList.get(position).getFile(), position);
             return true;
         });
     }

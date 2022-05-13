@@ -15,9 +15,9 @@ import java.io.IOException;
 public class ImageItem {
 
     private final Uri uri;
-    private final String name;
+    private String name;
     private final String size;
-    private final File file;
+    private File file;
     private final Bitmap thumbnail;
 
     public ImageItem(Uri uri, String name, String size, File file, Bitmap thumbnail) {
@@ -46,6 +46,10 @@ public class ImageItem {
 
     public Bitmap getThumbnail() {
         return thumbnail;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public static ImageItem createImage(Context context, Uri imgUri) {

@@ -49,7 +49,7 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
         );
 
         holder.container.setOnLongClickListener(view -> {
-            listener.onFileLongClicked(videoItemsList.get(position).getFile());
+            listener.onFileLongClicked(videoItemsList.get(position).getFile(), position);
             return true;
         });
     }

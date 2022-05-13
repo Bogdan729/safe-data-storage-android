@@ -1,7 +1,11 @@
 package com.project.safedatastorage.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -12,6 +16,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -19,10 +26,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.project.safedatastorage.adapter.CustomAdapter;
 import com.project.safedatastorage.adapter.ImageViewAdapter;
 import com.project.safedatastorage.R;
 import com.project.safedatastorage.adapter.RVEmptyObserver;
@@ -34,20 +43,24 @@ import com.project.safedatastorage.util.FileUtil;
 import com.project.safedatastorage.util.ImageUtil;
 import com.project.safedatastorage.writer.FileReaderWriter;
 
-
 import java.io.File;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentImage extends Fragment implements OnFileSelectedListener {
 
+    public static final String TAG = "FragmentImage";
+
     private static final String IMAGE_DIR = Environment.getExternalStorageDirectory().getPath() + "/DataStorage/images";
 
     private List<ImageItem> listImages;
     private Key keyObj;
+    String[] options = {"Rename", "Share", "Delete"};
 
     ImageViewAdapter adapter;
+    CustomAdapter customAdapter;
 
     Button addImage;
     View view;
@@ -66,6 +79,8 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.image_fragment, container, false);
         View emptyView = new View(getContext());
+
+        customAdapter = new CustomAdapter(options, this);
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_image);
         adapter = new ImageViewAdapter(getContext(), listImages, this);
@@ -120,37 +135,12 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
         }
     }
 
-//    public void saveFile(Uri uri) {
-//        try {
-//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-//                File file = FileUtil.getFileFromUri(getContext(), uri);
-//
-//                FileReaderWriter.writeToInternalStorage(file, keyObj, IMAGE_DIR);
-//
-//                Bitmap bitmap = ImageUtil.getThumbnail(file);
-//                String size = FileUtil.getFormattedFileSize(file.length());
-//                String fileName = file.getName();
-//
-//                int necessaryRotation = FileUtil.getFileExifRotation(file);
-//
-//                Bitmap result = ImageUtil.rotateImage(bitmap, necessaryRotation);
-//                ImageItem item = new ImageItem(fileName, size, result);
-//
-//                listImages.add(item);
-//                adapter.notifyItemChanged(listImages.size());
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void onActivityResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Uri uri = result.getData().getData();
-            ImageItem item1 = ImageItem.createImage(getContext(), uri);
-            FileReaderWriter.writeToInternalStorage(item1.getFile(), keyObj, IMAGE_DIR);
-            listImages.add(item1);
+            ImageItem imgItem = ImageItem.createImage(getContext(), uri);
+            listImages.add(imgItem);
             adapter.notifyItemChanged(listImages.size());
         }
     }
@@ -165,7 +155,96 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
     }
 
     @Override
-    public void onFileLongClicked(File file) {
+    public void onFileLongClicked(File file, int position) {
+        final Dialog optionDialog = new Dialog(getContext());
+        optionDialog.setContentView(R.layout.option_dialog);
+        optionDialog.setTitle("Select Options.");
+        ListView listViewOptions = optionDialog.findViewById(R.id.list_view);
+        listViewOptions.setAdapter(customAdapter);
+        optionDialog.show();
 
+        listViewOptions.setOnItemClickListener((adapterView, view, i, l) -> {
+            String selectedItem = adapterView.getItemAtPosition(i).toString();
+
+            switch (selectedItem) {
+                case "Rename":
+                    AlertDialog.Builder renameDialog = new AlertDialog.Builder(getContext());
+                    renameDialog.setTitle("Rename File :");
+                    final EditText name = new EditText(getContext());
+                    renameDialog.setView(name);
+
+                    renameDialog.setPositiveButton("OK", (dialogInterface, i1) -> {
+                        ImageItem currentItem = listImages.get(position);
+
+                        String extension = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf("."));
+                        String newName = name.getEditableText().toString() + extension;
+
+                        File currentTemp = new File(file.getAbsolutePath());
+                        File destinationTemp = new File(file.getAbsolutePath().replace(currentItem.getName(), newName));
+
+                        if (currentTemp.renameTo(destinationTemp)) {
+                            FileUtil.renameFileInInternalStorage(file.getName(), newName, IMAGE_DIR);
+
+                            currentItem.setName(newName);
+                            listImages.set(position, currentItem);
+                            adapter.notifyItemChanged(position);
+                            Toast.makeText(getContext(), "Renamed", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Couldn't Renamed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    renameDialog.setNegativeButton("Cancel", (dialogInterface, i12) -> {
+                        optionDialog.cancel();
+                    });
+
+                    AlertDialog alertDialogRename = renameDialog.create();
+                    alertDialogRename.show();
+
+                    break;
+
+                case "Share":
+                    Intent share = new Intent();
+                    share.setAction(Intent.ACTION_SEND);
+                    share.setType(URLConnection.guessContentTypeFromName(file.getName()));
+
+                    Uri uri = FileProvider.getUriForFile(getContext(),
+                            getContext().getApplicationContext().getPackageName() + ".provider", file);
+
+                    share.putExtra(Intent.EXTRA_STREAM, uri);
+
+                    List<ResolveInfo> resInfoList = getContext().getPackageManager().queryIntentActivities(share, PackageManager.MATCH_DEFAULT_ONLY);
+                    for (ResolveInfo resolveInfo : resInfoList) {
+                        String packageName = resolveInfo.activityInfo.packageName;
+                        getContext().grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    }
+
+                    startActivity(Intent.createChooser(share, "Share"));
+                    break;
+
+                case "Delete":
+                    AlertDialog.Builder deleteDialog = new AlertDialog.Builder(getContext());
+                    deleteDialog.setTitle("Delete " + file.getName() + "?");
+                    deleteDialog.setPositiveButton("Yes", (dialogInterface, i1) -> {
+                        FileUtil.deleteFileInInternalStorage(file.getName(), IMAGE_DIR);
+
+                        file.delete();
+                        listImages.remove(position);
+                        adapter.notifyDataSetChanged();
+                        Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                    });
+
+                    deleteDialog.setNegativeButton("No", (dialogInterface, i2) -> {
+                        optionDialog.cancel();
+                        Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                    });
+
+                    AlertDialog alertDialog = deleteDialog.create();
+                    alertDialog.show();
+
+                    getLayoutInflater();
+                    break;
+            }
+        });
     }
 }

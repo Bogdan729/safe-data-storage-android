@@ -48,7 +48,7 @@ public class ImageViewAdapter extends RecyclerView.Adapter<ImageViewAdapter.View
         );
 
         holder.container.setOnLongClickListener(view -> {
-            listener.onFileLongClicked(imageItemsList.get(position).getFile());
+            listener.onFileLongClicked(imageItemsList.get(position).getFile(), position);
             return true;
         });
     }
