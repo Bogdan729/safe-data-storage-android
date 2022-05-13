@@ -57,7 +57,8 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
 
     private List<ImageItem> listImages;
     private Key keyObj;
-    String[] options = {"Rename", "Share", "Delete"};
+
+    private final String[] options = {"Rename", "Share", "Delete"};
 
     ImageViewAdapter adapter;
     CustomAdapter customAdapter;
