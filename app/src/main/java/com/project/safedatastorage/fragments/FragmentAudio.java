@@ -6,8 +6,13 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.media.AudioDescriptor;
+import android.media.MediaPlayer;
 import android.net.Uri;
+import android.net.rtp.AudioStream;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -42,8 +47,11 @@ import com.project.safedatastorage.util.FileUtil;
 import com.project.safedatastorage.writer.FileReaderWriter;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +61,7 @@ public class FragmentAudio extends Fragment implements OnFileSelectedListener {
 
     private List<AudioItem> audioList;
     private Key keyObj;
+    static int countPlayAudio = 1;
 
     AudioViewAdapter adapter;
     CustomAdapter customAdapter;
@@ -138,11 +147,16 @@ public class FragmentAudio extends Fragment implements OnFileSelectedListener {
 
     @Override
     public void onFileClicked(File file) {
-        try {
-            FileOpener.openFile(getContext(), file);
-        } catch (IOException e) {
-            e.printStackTrace();
+        Uri uri = FileProvider.getUriForFile(getContext(),
+                getContext().getApplicationContext().getPackageName() + ".provider", file);
+
+        if (countPlayAudio % 2 == 1) {
+            MediaPlayer.create(getContext(), uri).start();
+        } else {
+            MediaPlayer.create(getContext(), uri).stop();
         }
+
+        countPlayAudio++;
     }
 
     @Override
