@@ -26,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         // ТЕСТИРОВАНИЕ ИНИЦИАЛИЗАЦИИ ХРАНИЛИЩА
 
 //        setPasswordBtn.setOnClickListener(view -> {
@@ -61,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 //
 //        Button button = findViewById(R.id.buttonLoadPicture);
 //        input = findViewById(R.id.password);
-//
+
         Dexter.withContext(this)
                 .withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -82,8 +80,6 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Пожалуйста, предоставьте права приложению", Toast.LENGTH_SHORT).show();
                     }
                 }).check();
-
-        // ОСНОВНАЯ ЛОГИКА
     }
 
     public boolean isDefaultDirExists() {
