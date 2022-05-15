@@ -12,7 +12,7 @@
         android:layout_marginBottom="32dp"
         android:text="Войти"
         app:icon="@drawable/ic_lock_open"
-        android:backgroundTint="#0F30E8"
+        android:backgroundTint="@color/main_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

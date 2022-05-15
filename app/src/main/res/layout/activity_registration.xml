@@ -50,7 +50,7 @@
         android:layout_width="220dp"
         android:layout_height="41dp"
         android:layout_marginBottom="32dp"
-        android:backgroundTint="#0F30E8"
+        android:backgroundTint="@color/main_blue"
         android:text="Задать пароль"
         app:icon="@drawable/ic_key"
         app:iconTint="#FFFFFF"
