@@ -141,6 +141,7 @@ public class FragmentImage extends Fragment implements OnFileSelectedListener {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Uri uri = result.getData().getData();
             ImageItem imgItem = ImageItem.createImage(getContext(), uri);
+            FileReaderWriter.writeToInternalStorage(imgItem.getFile(), keyObj, IMAGE_DIR);
             listImages.add(imgItem);
             adapter.notifyItemChanged(listImages.size());
         }
