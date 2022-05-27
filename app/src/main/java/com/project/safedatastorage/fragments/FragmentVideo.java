@@ -25,8 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,11 +34,10 @@ import com.project.safedatastorage.adapter.RVEmptyObserver;
 import com.project.safedatastorage.adapter.VideoViewAdapter;
 import com.project.safedatastorage.interaction.FileOpener;
 import com.project.safedatastorage.interaction.OnFileSelectedListener;
-import com.project.safedatastorage.items.ImageItem;
 import com.project.safedatastorage.items.VideoItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
-import com.project.safedatastorage.writer.FileReaderWriter;
+import com.project.safedatastorage.util.FileReaderWriter;
 
 import java.io.File;
 import java.io.IOException;

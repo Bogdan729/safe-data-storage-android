@@ -41,7 +41,7 @@ import com.project.safedatastorage.items.ImageItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
 import com.project.safedatastorage.util.ImageUtil;
-import com.project.safedatastorage.writer.FileReaderWriter;
+import com.project.safedatastorage.util.FileReaderWriter;
 
 import java.io.File;
 import java.io.IOException;

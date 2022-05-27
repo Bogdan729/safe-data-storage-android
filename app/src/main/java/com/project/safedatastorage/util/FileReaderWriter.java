@@ -1,4 +1,4 @@
-package com.project.safedatastorage.writer;
+package com.project.safedatastorage.util;
 
 import android.content.Context;
 

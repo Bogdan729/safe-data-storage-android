@@ -35,11 +35,10 @@ import com.project.safedatastorage.adapter.RVEmptyObserver;
 import com.project.safedatastorage.interaction.FileOpener;
 import com.project.safedatastorage.interaction.OnFileSelectedListener;
 import com.project.safedatastorage.items.DocumentItem;
-import com.project.safedatastorage.items.VideoItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
 import com.project.safedatastorage.util.PdfUtil;
-import com.project.safedatastorage.writer.FileReaderWriter;
+import com.project.safedatastorage.util.FileReaderWriter;
 
 import java.io.File;
 import java.io.IOException;
