@@ -1,10 +1,9 @@
-package com.project.safedatastorage.writer;
+package com.project.safedatastorage.util;
 
 import android.content.Context;
 
 import com.project.safedatastorage.security.Key;
-import com.project.safedatastorage.security.Magma;
-import com.project.safedatastorage.util.FileUtil;
+import com.project.safedatastorage.security.Kuznechik;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -16,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,7 +38,7 @@ public class FileReaderWriter {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
                 byte[] fileBytes = Files.readAllBytes(fileItem.toPath());
-                byte[] cipherText = Magma.encrypt(secretKey, fileBytes);
+                byte[] cipherText = Kuznechik.encrypt(secretKey, fileBytes);
 
                 fos = new FileOutputStream(file);
                 bos = new BufferedOutputStream(fos);
@@ -98,7 +96,7 @@ public class FileReaderWriter {
 
                     byte[] fileBytes;
                     fileBytes = Files.readAllBytes(file.toPath());
-                    byte[] decryptedText = Magma.decrypt(secretKey, fileBytes);
+                    byte[] decryptedText = Kuznechik.decrypt(secretKey, fileBytes);
 
                     stream = new ByteArrayInputStream(decryptedText);
 

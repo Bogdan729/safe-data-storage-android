@@ -13,12 +13,14 @@
 
     <Button
         android:id="@+id/add_video_btn"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:background="@drawable/round_button"
-        android:text="+"
+        android:layout_width="60dp"
+        android:layout_height="45dp"
         android:layout_margin="15dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-    </Button>
+        android:layout_marginEnd="212dp"
+        android:layout_marginBottom="28dp"
+        android:backgroundTint="@color/main_blue"
+        app:icon="@drawable/ic_add_video"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

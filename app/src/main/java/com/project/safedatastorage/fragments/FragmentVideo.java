@@ -25,8 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,11 +34,10 @@ import com.project.safedatastorage.adapter.RVEmptyObserver;
 import com.project.safedatastorage.adapter.VideoViewAdapter;
 import com.project.safedatastorage.interaction.FileOpener;
 import com.project.safedatastorage.interaction.OnFileSelectedListener;
-import com.project.safedatastorage.items.ImageItem;
 import com.project.safedatastorage.items.VideoItem;
 import com.project.safedatastorage.security.Key;
 import com.project.safedatastorage.util.FileUtil;
-import com.project.safedatastorage.writer.FileReaderWriter;
+import com.project.safedatastorage.util.FileReaderWriter;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +58,7 @@ public class FragmentVideo extends Fragment implements OnFileSelectedListener {
     Button addVideo;
     View view;
 
-    private final String[] options = {"Rename", "Share", "Delete"};
+    private final String[] options = {"Переименовать", "Отправить", "Удалить"};
 
     public FragmentVideo(Key keyObj) {
         this.keyObj = keyObj;
@@ -160,9 +157,9 @@ public class FragmentVideo extends Fragment implements OnFileSelectedListener {
             String selectedItem = adapterView.getItemAtPosition(i).toString();
 
             switch (selectedItem) {
-                case "Rename":
+                case "Переименовать":
                     AlertDialog.Builder renameDialog = new AlertDialog.Builder(getContext());
-                    renameDialog.setTitle("Rename File :");
+                    renameDialog.setTitle("Переименовать файл :");
                     final EditText name = new EditText(getContext());
                     renameDialog.setView(name);
 
@@ -181,13 +178,13 @@ public class FragmentVideo extends Fragment implements OnFileSelectedListener {
                             currentItem.setName(newName);
                             videoList.set(position, currentItem);
                             adapter.notifyItemChanged(position);
-                            Toast.makeText(getContext(), "Renamed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Успешно", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(getContext(), "Couldn't Renamed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Невозможно переименовать", Toast.LENGTH_SHORT).show();
                         }
                     });
 
-                    renameDialog.setNegativeButton("Cancel", (dialogInterface, i12) -> {
+                    renameDialog.setNegativeButton("Отмена", (dialogInterface, i12) -> {
                         optionDialog.cancel();
                     });
 
@@ -196,7 +193,7 @@ public class FragmentVideo extends Fragment implements OnFileSelectedListener {
 
                     break;
 
-                case "Share":
+                case "Отправить":
                     Intent share = new Intent();
                     share.setAction(Intent.ACTION_SEND);
                     share.setType(URLConnection.guessContentTypeFromName(file.getName()));
@@ -212,24 +209,24 @@ public class FragmentVideo extends Fragment implements OnFileSelectedListener {
                         getContext().grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     }
 
-                    startActivity(Intent.createChooser(share, "Share"));
+                    startActivity(Intent.createChooser(share, "Отправить"));
                     break;
 
-                case "Delete":
+                case "Удалить":
                     AlertDialog.Builder deleteDialog = new AlertDialog.Builder(getContext());
-                    deleteDialog.setTitle("Delete " + file.getName() + "?");
-                    deleteDialog.setPositiveButton("Yes", (dialogInterface, i1) -> {
+                    deleteDialog.setTitle("Удалить " + file.getName() + "?");
+                    deleteDialog.setPositiveButton("Да", (dialogInterface, i1) -> {
                         FileUtil.deleteFileInInternalStorage(file.getName(), VIDEO_DIR);
 
                         file.delete();
                         videoList.remove(position);
                         adapter.notifyDataSetChanged();
-                        Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Успешно", Toast.LENGTH_SHORT).show();
                     });
 
-                    deleteDialog.setNegativeButton("No", (dialogInterface, i2) -> {
+                    deleteDialog.setNegativeButton("Нет", (dialogInterface, i2) -> {
                         optionDialog.cancel();
-                        Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Удалено", Toast.LENGTH_SHORT).show();
                     });
 
                     AlertDialog alertDialog = deleteDialog.create();

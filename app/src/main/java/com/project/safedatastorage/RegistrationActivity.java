@@ -35,8 +35,8 @@ public class RegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
-        setPasswordEditText = findViewById(R.id.et_set_password);
-        repeatPasswordEditText = findViewById(R.id.et_repeat_password);
+        setPasswordEditText = findViewById(R.id.set_password);
+        repeatPasswordEditText = findViewById(R.id.repeat_password);
 
         Button setPasswordBtn = findViewById(R.id.btn_set_password);
 

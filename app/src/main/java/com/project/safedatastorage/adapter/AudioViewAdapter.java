@@ -33,7 +33,7 @@ public class AudioViewAdapter extends RecyclerView.Adapter<AudioViewAdapter.View
     @NonNull
     @Override
     public AudioViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.video_container, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.video_and_audio_container, parent, false);
         return new AudioViewAdapter.ViewHolder(view);
     }
 
