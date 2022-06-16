@@ -43,11 +43,11 @@ public class CustomAdapter extends BaseAdapter {
 
         textOptions.setText(options[i]);
 
-        if (options[i].equals("Rename")) {
+        if (options[i].equals("Переименовать")) {
             imgOptions.setImageResource(R.drawable.ic_rename);
-        } else if (options[i].equals("Share")) {
+        } else if (options[i].equals("Отправить")) {
             imgOptions.setImageResource(R.drawable.ic_share);
-        } else if (options[i].equals("Delete")) {
+        } else if (options[i].equals("Удалить")) {
             imgOptions.setImageResource(R.drawable.ic_delete);
         }
 

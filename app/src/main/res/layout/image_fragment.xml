@@ -11,17 +11,6 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
-<!--    <Button-->
-<!--        android:id="@+id/add_img_btn"-->
-<!--        android:layout_width="50dp"-->
-<!--        android:layout_height="50dp"-->
-<!--        android:background="@drawable/round_button"-->
-<!--        android:text="+"-->
-<!--        android:layout_margin="15dp"-->
-<!--        app:layout_constraintRight_toRightOf="parent"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent">-->
-<!--    </Button>-->
-
     <Button
         android:id="@+id/add_img_btn"
         android:layout_width="60dp"

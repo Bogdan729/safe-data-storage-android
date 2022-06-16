@@ -24,41 +24,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-
-        // ТЕСТИРОВАНИЕ ИНИЦИАЛИЗАЦИИ ХРАНИЛИЩА
-
-//        setPasswordBtn.setOnClickListener(view -> {
-//            Intent intent = new Intent("com.project.safedatastorage.RegistrationActivity");
-//            startActivity(intent);
-
-//                try {
-//                    String password = setPasswordEditText.getText().toString();
-//
-//                    setPasswordEditText.getText().clear();
-//                    repeatPasswordEditText.getText().clear();
-//
-//                    keyObj = new Key(password);
-//                    SecretKey secretKey = keyObj.getSecretKey();
-//                    String message = "test";
-//
-//                    byte[] cipherText = Magma.encrypt(secretKey, message.getBytes());
-//                    Log.d(TAG, "onCreate: " + new String(cipherText));
-//
-//                    byte[] decodedText = Magma.decrypt(secretKey, cipherText);
-//                    Log.d(TAG, "onCreate: " + new String(decodedText));
-//                } catch (GeneralSecurityException e) {
-//                    e.printStackTrace();
-//                }
-
-//        });
-
-        // ТЕСТИРОВАНИЕ ГЕНЕРАЦИИ КЛЮЧА НА ОСНОВЕ ВВЕДЕННОГО ПАРОЛЯ
-
-//        setContentView(R.layout.activity_main);
-//
-//        Button button = findViewById(R.id.buttonLoadPicture);
-//        input = findViewById(R.id.password);
 
         Dexter.withContext(this)
                 .withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,
